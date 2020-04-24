@@ -1,0 +1,39 @@
+{
+  "name": "cb-react-micro-frontend",
+  "version": "0.0.1",
+  "description": "React micro-frontend core",
+  "repository": "https://github.com/ICodeMyOwnLife/cb-react-micro-frontend.git",
+  "author": "Hien CB",
+  "license": "MIT",
+  "source": "src/index.ts",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rollup -c -w",
+    "build:config": "tsc rollup.config.ts --target es2017 --module es2015 --moduleResolution node --skipLibCheck --allowSyntheticDefaultImports -w",
+    "prebuild": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/history": "^4.7.5",
+    "@types/node": "^13.13.2",
+    "@types/react": "^16.9.34",
+    "@types/react-dom": "^16.9.6",
+    "@types/react-router": "^5.1.5",
+    "eslint": "^6.8.0",
+    "eslint-config-react-ts": "^2.1.0",
+    "history": "^4.10.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-router": "^5.1.2",
+    "rollup": "^2.7.2",
+    "rollup-plugin-cleanup": "^3.1.1",
+    "rollup-plugin-typescript2": "^0.27.0",
+    "typescript": "^3.8.3"
+  },
+  "peerDependencies": {
+    "history": "^4.10.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-router": "^5.1.2"
+  }
+}
