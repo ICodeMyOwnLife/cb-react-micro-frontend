@@ -4,6 +4,10 @@ import ReactDOM from 'react-dom';
 import { createBrowserHistory } from 'history';
 
 const generateContainerId = (name) => `${name}Container`;
+const joinUrlPaths = (...paths) => paths
+    .map(path => { var _a, _b; return (_b = (_a = path.match(/\/?(.+)\/?/)) === null || _a === void 0 ? void 0 : _a[1]) !== null && _b !== void 0 ? _b : ''; })
+    .filter(Boolean)
+    .join('/');
 
 const getRegistries = () => {
     const win = window;
@@ -54,7 +58,6 @@ function __rest(s, e) {
 }
 
 const generateScriptId = (name) => `_mfScript${name}`;
-const getScriptUrl = (host, path) => `${host}${path}`;
 const getManifestUrl = (host) => `${host}/asset-manifest.json`;
 const fetchManifest = async (host) => {
     const res = await fetch(getManifestUrl(host));
@@ -64,7 +67,7 @@ const fetchScripts = (manifest, host, scriptId) => new Promise(resolve => {
     let count = 0;
     manifest.entrypoints.forEach(entryPoint => {
         const script = document.createElement('script');
-        script.src = getScriptUrl(host, entryPoint);
+        script.src = joinUrlPaths(host, entryPoint);
         if (entryPoint === manifest.files['main.js'])
             script.id = scriptId;
         script.onload = () => {
