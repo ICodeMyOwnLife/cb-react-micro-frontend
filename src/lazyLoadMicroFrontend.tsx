@@ -16,16 +16,13 @@ const fetchManifest = async (host: string) => {
 const fetchScripts = (manifest: Manifest, host: string, scriptId: string) =>
   new Promise<void>(resolve => {
     let count = 0;
-    const scriptEntries = Object.entries(
-      manifest.files,
-    ).filter(([entryPoint]) => entryPoint.endsWith('.js'));
-    scriptEntries.forEach(([entryPoint, path]) => {
+    manifest.entrypoints.forEach(entryPoint => {
       const script = document.createElement('script');
-      script.src = getScriptUrl(host, path);
-      if (entryPoint === 'main.js') script.id = scriptId;
+      script.src = getScriptUrl(host, entryPoint);
+      if (entryPoint === manifest.files['main.js']) script.id = scriptId;
       script.onload = () => {
         count += 1;
-        if (count === scriptEntries.length) resolve();
+        if (count === manifest.entrypoints.length) resolve();
       };
       document.head.appendChild(script);
     });
@@ -57,7 +54,7 @@ interface Manifest {
     'main.js': string;
     'main.js.map': string;
     'index.html': string;
-    [entryPoint: string]: string;
+    [name: string]: string;
   };
   entrypoints: string[];
 }
