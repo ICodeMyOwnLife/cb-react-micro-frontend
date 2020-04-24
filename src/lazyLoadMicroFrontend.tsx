@@ -1,14 +1,14 @@
 import React, { lazy, FC } from 'react';
 import { History } from 'history';
 import MicroFrontend from './MicroFrontend';
-import { joinUrlPaths } from './utils';
 
 const generateScriptId = (name: string) => `_mfScript${name}`;
 
-const getManifestUrl = (host: string) => `${host}/asset-manifest.json`;
+const resolveUrl = (host: string, path: string) =>
+  new URL(path, host).toString();
 
 const fetchManifest = async (host: string) => {
-  const res = await fetch(getManifestUrl(host));
+  const res = await fetch(resolveUrl(host, '/asset-manifest.json'));
   return res.json() as Promise<Manifest>;
 };
 
@@ -17,7 +17,7 @@ const fetchScripts = (manifest: Manifest, host: string, scriptId: string) =>
     let count = 0;
     manifest.entrypoints.forEach(entryPoint => {
       const script = document.createElement('script');
-      script.src = joinUrlPaths(host, entryPoint);
+      script.src = resolveUrl(host, entryPoint);
       if (entryPoint === manifest.files['main.js']) script.id = scriptId;
       script.onload = () => {
         count += 1;
