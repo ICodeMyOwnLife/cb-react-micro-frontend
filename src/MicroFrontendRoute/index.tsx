@@ -1,7 +1,7 @@
 import React, { FC, memo } from 'react';
 import { Route } from 'react-router';
-import MicroFrontend from '../MicroFrontend';
 import { MicroFrontendRouteProps } from '../types';
+import lazyLoadMicroFrontend from '../lazyLoadMicroFrontend';
 
 export const MicroFrontendRouteComponent: FC<MicroFrontendRouteProps> = ({
   host,
@@ -10,9 +10,7 @@ export const MicroFrontendRouteComponent: FC<MicroFrontendRouteProps> = ({
 }) => (
   <Route
     {...props}
-    render={({ history }) => (
-      <MicroFrontend history={history} host={host} name={microFrontendName} />
-    )}
+    component={lazyLoadMicroFrontend({ host, microFrontendName })}
   />
 );
 

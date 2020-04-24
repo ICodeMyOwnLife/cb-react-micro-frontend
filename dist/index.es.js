@@ -1,4 +1,4 @@
-import React, { useEffect, memo } from 'react';
+import React, { useEffect, memo, lazy, Suspense } from 'react';
 import { Route, Switch } from 'react-router';
 import ReactDOM from 'react-dom';
 import { createBrowserHistory } from 'history';
@@ -12,57 +12,15 @@ const getRegistries = () => {
     return win._mfRegistries;
 };
 
-const generateScriptId = (name) => `_mfScript${name}`;
-const getScriptUrl = (host, path) => `${host}${path}`;
-const getManifestUrl = (host) => `${host}/asset-manifest.json`;
-const fetchManifest = async (host) => {
-    const res = await fetch(getManifestUrl(host));
-    return res.json();
-};
-const fetchScripts = (manifest, host, scriptId) => new Promise(resolve => {
-    let count = 0;
-    const scriptEntries = Object.entries(manifest.files).filter(([entryPoint]) => entryPoint.endsWith('.js'));
-    scriptEntries.forEach(([entryPoint, path]) => {
-        const script = document.createElement('script');
-        script.src = getScriptUrl(host, path);
-        if (entryPoint === 'main.js')
-            script.id = scriptId;
-        script.onload = () => {
-            count += 1;
-            if (count === scriptEntries.length)
-                resolve();
-        };
-        document.head.appendChild(script);
-    });
-});
 const renderMicroFrontend = ({ history, name, }) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.render(history); };
 const unmountMicroFrontend = ({ name }) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.unmount(); };
-const useMicroFrontend = ({ history, host, name, }) => useEffect(() => {
-    const scriptId = generateScriptId(name);
-    let isCanceled = false;
-    if (document.getElementById(scriptId)) {
-        renderMicroFrontend({ history, name });
-    }
-    else {
-        const fetchAndRender = async () => {
-            const manifest = await fetchManifest(host);
-            if (isCanceled)
-                return;
-            await fetchScripts(manifest, host, scriptId);
-            if (isCanceled)
-                return;
-            renderMicroFrontend({ history, name });
-        };
-        fetchAndRender();
-    }
-    return () => {
-        unmountMicroFrontend({ name });
-        isCanceled = true;
-    };
-}, [history, host, name]);
+const useMicroFrontend = ({ history, name, }) => useEffect(() => {
+    renderMicroFrontend({ history, name });
+    return () => unmountMicroFrontend({ name });
+}, [history, name]);
 
-const MicroFrontendComponent = ({ history, host, name, }) => {
-    useMicroFrontend({ history, host, name });
+const MicroFrontendComponent = ({ history, name, }) => {
+    useMicroFrontend({ history, name });
     return React.createElement("main", { id: generateContainerId(name) });
 };
 const MicroFrontend = memo(MicroFrontendComponent);
@@ -95,14 +53,48 @@ function __rest(s, e) {
     return t;
 }
 
+const generateScriptId = (name) => `_mfScript${name}`;
+const getScriptUrl = (host, path) => `${host}${path}`;
+const getManifestUrl = (host) => `${host}/asset-manifest.json`;
+const fetchManifest = async (host) => {
+    const res = await fetch(getManifestUrl(host));
+    return res.json();
+};
+const fetchScripts = (manifest, host, scriptId) => new Promise(resolve => {
+    let count = 0;
+    const scriptEntries = Object.entries(manifest.files).filter(([entryPoint]) => entryPoint.endsWith('.js'));
+    scriptEntries.forEach(([entryPoint, path]) => {
+        const script = document.createElement('script');
+        script.src = getScriptUrl(host, path);
+        if (entryPoint === 'main.js')
+            script.id = scriptId;
+        script.onload = () => {
+            count += 1;
+            if (count === scriptEntries.length)
+                resolve();
+        };
+        document.head.appendChild(script);
+    });
+});
+const lazyLoadMicroFrontend = ({ host, microFrontendName, }) => lazy(async () => {
+    const scriptId = generateScriptId(microFrontendName);
+    if (!document.getElementById(scriptId)) {
+        const manifest = await fetchManifest(host);
+        await fetchScripts(manifest, host, scriptId);
+    }
+    const Component = ({ history }) => (React.createElement(MicroFrontend, { history: history, name: microFrontendName }));
+    return { default: Component };
+});
+
 const MicroFrontendRouteComponent = (_a) => {
     var { host, microFrontendName } = _a, props = __rest(_a, ["host", "microFrontendName"]);
-    return (React.createElement(Route, Object.assign({}, props, { render: ({ history }) => (React.createElement(MicroFrontend, { history: history, host: host, name: microFrontendName })) })));
+    return (React.createElement(Route, Object.assign({}, props, { component: lazyLoadMicroFrontend({ host, microFrontendName }) })));
 };
 const MicroFrontendRoute = memo(MicroFrontendRouteComponent);
 MicroFrontendRoute.displayName = 'MicroFrontendRoute';
 
-const MicroFrontendRoutesComponent = ({ routeProps, }) => (React.createElement(Switch, null, routeProps.map(props => (React.createElement(MicroFrontendRoute, Object.assign({}, props, { key: props.microFrontendName }))))));
+const MicroFrontendRoutesComponent = ({ fallback, routeProps, }) => (React.createElement(Switch, null,
+    React.createElement(Suspense, { fallback: fallback }, routeProps.map(props => (React.createElement(MicroFrontendRoute, Object.assign({}, props, { key: props.microFrontendName })))))));
 const MicroFrontendRoutes = memo(MicroFrontendRoutesComponent);
 MicroFrontendRoutes.displayName = 'MicroFrontendRoutes';
 
@@ -135,4 +127,4 @@ const bootstrapMicroFrontend = (name, App, callback) => {
     }
 };
 
-export { MicroFrontend, MicroFrontendRoute, MicroFrontendRoutes, bootstrapMicroFrontend };
+export { MicroFrontend, MicroFrontendRoute, MicroFrontendRoutes, bootstrapMicroFrontend, lazyLoadMicroFrontend };
