@@ -1,6 +1,7 @@
 import React, { lazy, FC } from 'react';
 import { History } from 'history';
 import MicroFrontend from './MicroFrontend';
+import { setMicroFrontendInfo } from './microFrontendLoader';
 
 const generateScriptId = (name: string) => `_mfScript${name}`;
 
@@ -16,11 +17,11 @@ const fetchScripts = (manifest: Manifest, host: string, scriptId: string) =>
   new Promise<void>(resolve => {
     let count = 0;
     manifest.entrypoints
-      .filter(entryPoint => entryPoint.endsWith('.js'))
-      .forEach(entryPoint => {
+      .filter(entry => entry.endsWith('.js'))
+      .forEach(entry => {
         const script = document.createElement('script');
-        script.src = resolveUrl(host, entryPoint);
-        if (entryPoint === manifest.files['main.js']) script.id = scriptId;
+        script.src = resolveUrl(host, entry);
+        if (entry === manifest.files['main.js']) script.id = scriptId;
         script.onload = () => {
           count += 1;
           if (count === manifest.entrypoints.length) resolve();
@@ -37,6 +38,7 @@ const lazyLoadMicroFrontend = ({
   microFrontendName: string;
 }) =>
   lazy(async () => {
+    setMicroFrontendInfo(microFrontendName, host);
     const scriptId = generateScriptId(microFrontendName);
     if (!document.getElementById(scriptId)) {
       const manifest = await fetchManifest(host);

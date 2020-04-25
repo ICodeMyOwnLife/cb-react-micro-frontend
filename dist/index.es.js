@@ -23,6 +23,12 @@ const removeMicroFrontendInfo = (name) => {
         document.cookie = `${mfInfoKey}=; Max-Age=-99999999;`;
     }
 };
+const setMicroFrontendInfo = (name, host) => {
+    const info = { host, name };
+    glo[mfInfoKey] = info;
+    const expires = new Date(Date.now() + 10 * 365 * 60 * 60 * 1000);
+    document.cookie = `${mfInfoKey}=${JSON.stringify(info)}; expires=${expires.toUTCString()}; path=/`;
+};
 
 const renderMicroFrontend = ({ history, name, }) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.render(history); };
 const unmountMicroFrontend = ({ name }) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.unmount(); };
@@ -77,11 +83,11 @@ const fetchManifest = async (host) => {
 const fetchScripts = (manifest, host, scriptId) => new Promise(resolve => {
     let count = 0;
     manifest.entrypoints
-        .filter(entryPoint => entryPoint.endsWith('.js'))
-        .forEach(entryPoint => {
+        .filter(entry => entry.endsWith('.js'))
+        .forEach(entry => {
         const script = document.createElement('script');
-        script.src = resolveUrl(host, entryPoint);
-        if (entryPoint === manifest.files['main.js'])
+        script.src = resolveUrl(host, entry);
+        if (entry === manifest.files['main.js'])
             script.id = scriptId;
         script.onload = () => {
             count += 1;
@@ -92,6 +98,7 @@ const fetchScripts = (manifest, host, scriptId) => new Promise(resolve => {
     });
 });
 const lazyLoadMicroFrontend = ({ host, microFrontendName, }) => lazy(async () => {
+    setMicroFrontendInfo(microFrontendName, host);
     const scriptId = generateScriptId(microFrontendName);
     if (!document.getElementById(scriptId)) {
         const manifest = await fetchManifest(host);
