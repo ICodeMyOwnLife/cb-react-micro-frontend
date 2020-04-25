@@ -45,7 +45,7 @@ const lazyLoadMicroFrontend = ({
       await fetchScripts(manifest, host, scriptId);
     }
     const Component: FC<{ history: History }> = ({ history }) => (
-      <MicroFrontend history={history} name={microFrontendName} />
+      <MicroFrontend history={history} host={host} name={microFrontendName} />
     );
     return { default: Component };
   });

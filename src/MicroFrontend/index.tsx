@@ -5,9 +5,10 @@ import { useMicroFrontend } from './utils';
 
 export const MicroFrontendComponent: FC<MicroFrontendProps> = ({
   history,
+  host,
   name,
 }) => {
-  useMicroFrontend({ history, name });
+  useMicroFrontend({ history, host, name });
   return <main id={generateContainerId(name)} />;
 };
 

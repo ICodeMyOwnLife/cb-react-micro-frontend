@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
 import { History } from 'history';
 import getRegistries from '../getRegistries';
-import { removeMicroFrontendInfo } from '../microFrontendLoader';
+import {
+  removeMicroFrontendInfo,
+  setMicroFrontendInfo,
+} from '../microFrontendLoader';
 
 const renderMicroFrontend = ({
   history,
@@ -16,15 +19,18 @@ const unmountMicroFrontend = ({ name }: { name: string }) =>
 
 export const useMicroFrontend = ({
   history,
+  host,
   name,
 }: {
   history: History;
+  host: string;
   name: string;
 }) =>
   useEffect(() => {
+    setMicroFrontendInfo(name, host);
     renderMicroFrontend({ history, name });
     return () => {
       unmountMicroFrontend({ name });
       removeMicroFrontendInfo(name);
     };
-  }, [history, name]);
+  }, [history, host, name]);

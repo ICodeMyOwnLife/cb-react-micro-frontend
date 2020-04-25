@@ -8,13 +8,13 @@ export interface MicroFrontendAppProps {
 
 export interface MicroFrontendProps {
   history: History;
+  host: string;
   name: string;
 }
 
 export interface MicroFrontendRouteProps
   extends OmitFrom<RouteProps, 'render'>,
     OmitFrom<MicroFrontendProps, 'history' | 'name'> {
-  host: string;
   microFrontendName: string;
   path: string;
 }

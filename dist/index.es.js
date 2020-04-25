@@ -32,16 +32,17 @@ const setMicroFrontendInfo = (name, host) => {
 
 const renderMicroFrontend = ({ history, name, }) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.render(history); };
 const unmountMicroFrontend = ({ name }) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.unmount(); };
-const useMicroFrontend = ({ history, name, }) => useEffect(() => {
+const useMicroFrontend = ({ history, host, name, }) => useEffect(() => {
+    setMicroFrontendInfo(name, host);
     renderMicroFrontend({ history, name });
     return () => {
         unmountMicroFrontend({ name });
         removeMicroFrontendInfo(name);
     };
-}, [history, name]);
+}, [history, host, name]);
 
-const MicroFrontendComponent = ({ history, name, }) => {
-    useMicroFrontend({ history, name });
+const MicroFrontendComponent = ({ history, host, name, }) => {
+    useMicroFrontend({ history, host, name });
     return React.createElement("main", { id: generateContainerId(name) });
 };
 const MicroFrontend = memo(MicroFrontendComponent);
@@ -104,7 +105,7 @@ const lazyLoadMicroFrontend = ({ host, microFrontendName, }) => lazy(async () =>
         const manifest = await fetchManifest(host);
         await fetchScripts(manifest, host, scriptId);
     }
-    const Component = ({ history }) => (React.createElement(MicroFrontend, { history: history, name: microFrontendName }));
+    const Component = ({ history }) => (React.createElement(MicroFrontend, { history: history, host: host, name: microFrontendName }));
     return { default: Component };
 });
 
