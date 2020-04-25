@@ -54,10 +54,15 @@ function __rest(s, e) {
 }
 
 /* eslint-disable no-underscore-dangle */
-const win = window;
-const isLoadedAsMicroFrontend = (name) => name === win._mfName;
-const setMicroFrontendName = (name) => {
-    win._mfName = name;
+const glo = global;
+const mfInfoKey = '_mfInfo';
+const isLoadedAsMicroFrontend = (name) => { var _a; return name === ((_a = glo[mfInfoKey]) === null || _a === void 0 ? void 0 : _a.name); };
+const setMicroFrontendInfo = (name, host) => {
+    const info = { host, name };
+    glo[mfInfoKey] = info;
+    if (window && document) {
+        document.cookie = `${mfInfoKey}:${JSON.stringify(info)}; path=/`;
+    }
 };
 
 const generateScriptId = (name) => `_mfScript${name}`;
@@ -82,7 +87,7 @@ const fetchScripts = (manifest, host, scriptId) => new Promise(resolve => {
     });
 });
 const lazyLoadMicroFrontend = ({ host, microFrontendName, }) => lazy(async () => {
-    setMicroFrontendName(microFrontendName);
+    setMicroFrontendInfo(microFrontendName, host);
     const scriptId = generateScriptId(microFrontendName);
     if (!document.getElementById(scriptId)) {
         const manifest = await fetchManifest(host);
