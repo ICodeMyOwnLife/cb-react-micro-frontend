@@ -4,22 +4,22 @@ import { History, createBrowserHistory } from 'history';
 import getRegistries from './getRegistries';
 import { generateContainerId } from './utils';
 import { MicroFrontendAppProps } from './types';
+import { isLoadedAsMicroFrontend } from './microFrontendLoader';
 
 const renderApp = (
-  container: HTMLElement,
+  containerId: string,
   App: ComponentType<MicroFrontendAppProps>,
   history: History,
   isMicroFrontend: boolean,
 ) => {
   ReactDOM.render(
     <App history={history} isMicroFrontend={isMicroFrontend} />,
-    container,
+    document.getElementById(containerId),
   );
 };
 
 const registerApp = (
   name: string,
-  container: HTMLElement,
   App: ComponentType<MicroFrontendAppProps>,
   callback?: VoidFunction,
 ) => {
@@ -31,11 +31,13 @@ const registerApp = (
   }
   registries.set(name, {
     render: history => {
-      renderApp(container, App, history, true);
+      renderApp(generateContainerId(name), App, history, true);
       callback?.();
     },
     unmount: () => {
-      ReactDOM.unmountComponentAtNode(container);
+      ReactDOM.unmountComponentAtNode(
+        document.getElementById(generateContainerId(name))!,
+      );
     },
   });
 };
@@ -44,19 +46,12 @@ const bootstrapMicroFrontend = (
   name: string,
   App: ComponentType<MicroFrontendAppProps>,
   callback?: VoidFunction,
+  rootId = 'root',
 ) => {
-  const containerId = generateContainerId(name);
-  const container = document.getElementById(containerId);
-
-  if (container) {
-    registerApp(name, container, App, callback);
+  if (isLoadedAsMicroFrontend(name)) {
+    registerApp(name, App, callback);
   } else {
-    renderApp(
-      document.getElementById('root')!,
-      App,
-      createBrowserHistory(),
-      false,
-    );
+    renderApp(rootId, App, createBrowserHistory(), false);
   }
 };
 

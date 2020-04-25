@@ -53,6 +53,12 @@ function __rest(s, e) {
     return t;
 }
 
+let microFrontendName = null;
+const isLoadedAsMicroFrontend = (name) => name === microFrontendName;
+const setMicroFrontendName = (name) => {
+    microFrontendName = name;
+};
+
 const generateScriptId = (name) => `_mfScript${name}`;
 const resolveUrl = (host, path) => new URL(path, host).toString();
 const fetchManifest = async (host) => {
@@ -75,6 +81,7 @@ const fetchScripts = (manifest, host, scriptId) => new Promise(resolve => {
     });
 });
 const lazyLoadMicroFrontend = ({ host, microFrontendName, }) => lazy(async () => {
+    setMicroFrontendName(microFrontendName);
     const scriptId = generateScriptId(microFrontendName);
     if (!document.getElementById(scriptId)) {
         const manifest = await fetchManifest(host);
@@ -96,32 +103,30 @@ const MicroFrontendRoutesComponent = ({ fallback, routeProps, }) => (React.creat
 const MicroFrontendRoutes = memo(MicroFrontendRoutesComponent);
 MicroFrontendRoutes.displayName = 'MicroFrontendRoutes';
 
-const renderApp = (container, App, history, isMicroFrontend) => {
-    ReactDOM.render(React.createElement(App, { history: history, isMicroFrontend: isMicroFrontend }), container);
+const renderApp = (containerId, App, history, isMicroFrontend) => {
+    ReactDOM.render(React.createElement(App, { history: history, isMicroFrontend: isMicroFrontend }), document.getElementById(containerId));
 };
-const registerApp = (name, container, App, callback) => {
+const registerApp = (name, App, callback) => {
     const registries = getRegistries();
     if (registries.has(name) && process.env.NODE_ENV !== 'production') {
         console.warn(`Register Micro Frontend with the same name '${name}'. It's probable a mistake.`);
     }
     registries.set(name, {
         render: history => {
-            renderApp(container, App, history, true);
+            renderApp(generateContainerId(name), App, history, true);
             callback === null || callback === void 0 ? void 0 : callback();
         },
         unmount: () => {
-            ReactDOM.unmountComponentAtNode(container);
+            ReactDOM.unmountComponentAtNode(document.getElementById(generateContainerId(name)));
         },
     });
 };
-const bootstrapMicroFrontend = (name, App, callback) => {
-    const containerId = generateContainerId(name);
-    const container = document.getElementById(containerId);
-    if (container) {
-        registerApp(name, container, App, callback);
+const bootstrapMicroFrontend = (name, App, callback, rootId = 'root') => {
+    if (isLoadedAsMicroFrontend(name)) {
+        registerApp(name, App, callback);
     }
     else {
-        renderApp(document.getElementById('root'), App, createBrowserHistory(), false);
+        renderApp(rootId, App, createBrowserHistory(), false);
     }
 };
 
