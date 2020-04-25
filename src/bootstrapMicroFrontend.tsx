@@ -57,14 +57,13 @@ const registerApp = (
 };
 
 const bootstrapMicroFrontend = (
+  microFrontendName: string,
   App: ComponentType<MicroFrontendAppProps>,
   callback?: VoidFunction,
   rootId = 'root',
 ) => {
-  const { name } = require(`${process.cwd()}/package.json`);
-
-  if (isLoadedAsMicroFrontend(name)) {
-    registerApp(name, App, callback);
+  if (isLoadedAsMicroFrontend(microFrontendName)) {
+    registerApp(microFrontendName, App, callback);
   } else {
     renderApp(rootId, App, createBrowserHistory(), '', false);
   }
