@@ -11,7 +11,7 @@ export const setMicroFrontendInfo = (name: string, host: string) => {
   const info: MicroFrontendInfo = { host, name };
   glo[mfInfoKey] = info;
   if (window && document) {
-    document.cookie = `${mfInfoKey}:${JSON.stringify(info)}; path=/`;
+    document.cookie = `${mfInfoKey}=${JSON.stringify(info)}; path=/`;
   }
 };
 
