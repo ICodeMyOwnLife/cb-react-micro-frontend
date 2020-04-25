@@ -83,12 +83,14 @@ const fetchManifest = async (host) => {
 };
 const fetchScripts = (manifest, host, scriptId) => new Promise(resolve => {
     let count = 0;
+    const mainJsUrl = resolveUrl(host, manifest.files['main.js']);
     manifest.entrypoints
         .filter(entry => entry.endsWith('.js'))
         .forEach(entry => {
         const script = document.createElement('script');
-        script.src = resolveUrl(host, entry);
-        if (entry === manifest.files['main.js'])
+        const entryUrl = resolveUrl(host, entry);
+        script.src = entryUrl;
+        if (entryUrl === mainJsUrl)
             script.id = scriptId;
         script.onload = () => {
             count += 1;
