@@ -20,7 +20,7 @@ const removeMicroFrontendInfo = (name) => {
     var _a;
     if (!name || ((_a = glo[mfInfoKey]) === null || _a === void 0 ? void 0 : _a.name) === name) {
         glo[mfInfoKey] = undefined;
-        document.cookie = `${mfInfoKey}=; path=/`;
+        document.cookie = `${mfInfoKey}=; Max-Age=-99999999;`;
     }
 };
 

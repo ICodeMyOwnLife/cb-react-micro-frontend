@@ -10,14 +10,17 @@ export const isLoadedAsMicroFrontend = (name: string) =>
 export const removeMicroFrontendInfo = (name?: string) => {
   if (!name || glo[mfInfoKey]?.name === name) {
     glo[mfInfoKey] = undefined;
-    document.cookie = `${mfInfoKey}=; path=/`;
+    document.cookie = `${mfInfoKey}=; Max-Age=-99999999;`;
   }
 };
 
 export const setMicroFrontendInfo = (name: string, host: string) => {
   const info: MicroFrontendInfo = { host, name };
   glo[mfInfoKey] = info;
-  document.cookie = `${mfInfoKey}=${JSON.stringify(info)}; path=/`;
+  const expires = new Date(Date.now() + 10 * 365 * 60 * 60 * 1000);
+  document.cookie = `${mfInfoKey}=${JSON.stringify(
+    info,
+  )}; expires=${expires.toUTCString()}; path=/`;
 };
 
 interface MicroFrontendGlobal
