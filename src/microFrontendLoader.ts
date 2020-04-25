@@ -1,14 +1,24 @@
 /* eslint-disable no-underscore-dangle */
-const win = (window as unknown) as MicroFrontendWindow;
+const glo = (global as unknown) as MicroFrontendGlobal;
+const mfInfoKey = '_mfInfo';
 
-export const getMicroFrontendName = () => win._mfName;
+export const getMicroFrontendInfo = () => glo[mfInfoKey];
 
-export const isLoadedAsMicroFrontend = (name: string) => name === win._mfName;
+export const isLoadedAsMicroFrontend = (name: string) =>
+  name === glo[mfInfoKey]?.name;
 
-export const setMicroFrontendName = (name: string) => {
-  win._mfName = name;
+export const setMicroFrontendInfo = (name: string, host: string) => {
+  const info: MicroFrontendInfo = { host, name };
+  glo[mfInfoKey] = info;
+  if (window && document) {
+    document.cookie = `${mfInfoKey}:${JSON.stringify(info)}; path=/`;
+  }
 };
 
-interface MicroFrontendWindow extends Window {
-  _mfName: string | null | undefined;
+interface MicroFrontendGlobal
+  extends Record<typeof mfInfoKey, MicroFrontendInfo | undefined | null> {}
+
+interface MicroFrontendInfo {
+  host: string;
+  name: string;
 }

@@ -1,7 +1,7 @@
 import React, { lazy, FC } from 'react';
 import { History } from 'history';
 import MicroFrontend from './MicroFrontend';
-import { setMicroFrontendName } from './microFrontendLoader';
+import { setMicroFrontendInfo } from './microFrontendLoader';
 
 const generateScriptId = (name: string) => `_mfScript${name}`;
 
@@ -36,7 +36,7 @@ const lazyLoadMicroFrontend = ({
   microFrontendName: string;
 }) =>
   lazy(async () => {
-    setMicroFrontendName(microFrontendName);
+    setMicroFrontendInfo(microFrontendName, host);
     const scriptId = generateScriptId(microFrontendName);
     if (!document.getElementById(scriptId)) {
       const manifest = await fetchManifest(host);
