@@ -53,10 +53,11 @@ function __rest(s, e) {
     return t;
 }
 
-let microFrontendName = null;
-const isLoadedAsMicroFrontend = (name) => name === microFrontendName;
+/* eslint-disable no-underscore-dangle */
+const win = window;
+const isLoadedAsMicroFrontend = (name) => name === win._mfName;
 const setMicroFrontendName = (name) => {
-    microFrontendName = name;
+    win._mfName = name;
 };
 
 const generateScriptId = (name) => `_mfScript${name}`;

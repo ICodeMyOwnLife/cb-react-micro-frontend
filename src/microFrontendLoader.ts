@@ -1,10 +1,14 @@
-let microFrontendName: string | null = null;
+/* eslint-disable no-underscore-dangle */
+const win = (window as unknown) as MicroFrontendWindow;
 
-export const getMicroFrontendName = () => microFrontendName;
+export const getMicroFrontendName = () => win._mfName;
 
-export const isLoadedAsMicroFrontend = (name: string) =>
-  name === microFrontendName;
+export const isLoadedAsMicroFrontend = (name: string) => name === win._mfName;
 
 export const setMicroFrontendName = (name: string) => {
-  microFrontendName = name;
+  win._mfName = name;
 };
+
+interface MicroFrontendWindow extends Window {
+  _mfName: string | null | undefined;
+}
