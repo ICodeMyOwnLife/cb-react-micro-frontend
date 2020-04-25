@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { History } from 'history';
 import getRegistries from '../getRegistries';
+import { removeMicroFrontendInfo } from '../microFrontendLoader';
 
 const renderMicroFrontend = ({
   history,
@@ -22,5 +23,8 @@ export const useMicroFrontend = ({
 }) =>
   useEffect(() => {
     renderMicroFrontend({ history, name });
-    return () => unmountMicroFrontend({ name });
+    return () => {
+      unmountMicroFrontend({ name });
+      removeMicroFrontendInfo(name);
+    };
   }, [history, name]);
