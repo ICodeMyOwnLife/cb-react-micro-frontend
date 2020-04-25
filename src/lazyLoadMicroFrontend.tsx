@@ -17,19 +17,20 @@ const fetchScripts = (manifest: Manifest, host: string, scriptId: string) =>
   new Promise<void>(resolve => {
     let count = 0;
     const mainJsUrl = resolveUrl(host, manifest.files['main.js']);
-    manifest.entrypoints
-      .filter(entry => entry.endsWith('.js'))
-      .forEach(entry => {
-        const script = document.createElement('script');
-        const entryUrl = resolveUrl(host, entry);
-        script.src = entryUrl;
-        if (entryUrl === mainJsUrl) script.id = scriptId;
-        script.onload = () => {
-          count += 1;
-          if (count === manifest.entrypoints.length) resolve();
-        };
-        document.head.appendChild(script);
-      });
+    const scriptEntries = manifest.entrypoints.filter(entry =>
+      entry.endsWith('.js'),
+    );
+    scriptEntries.forEach(entry => {
+      const script = document.createElement('script');
+      const entryUrl = resolveUrl(host, entry);
+      script.src = entryUrl;
+      if (entryUrl === mainJsUrl) script.id = scriptId;
+      script.onload = () => {
+        count += 1;
+        if (count === scriptEntries.length) resolve();
+      };
+      document.head.appendChild(script);
+    });
   });
 
 const lazyLoadMicroFrontend = ({
