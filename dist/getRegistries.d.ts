@@ -6,7 +6,7 @@ interface MicroFrontendRegistry {
     unmount: UnmountMicroFrontend;
 }
 interface RenderMicroFrontend {
-    (history: History): void;
+    (history: History, microFrontendPath: string): void;
 }
 interface UnmountMicroFrontend {
     (): void;

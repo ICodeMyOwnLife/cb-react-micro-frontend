@@ -1,6 +1,2 @@
-import { History } from 'history';
-export declare const useMicroFrontend: ({ history, host, name, }: {
-    history: History<History.PoorMansUnknown>;
-    host: string;
-    name: string;
-}) => void;
+import { MicroFrontendProps } from '../types';
+export declare const useMicroFrontend: ({ history, host, name, path, }: MicroFrontendProps) => void;

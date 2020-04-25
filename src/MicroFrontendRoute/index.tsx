@@ -6,11 +6,17 @@ import lazyLoadMicroFrontend from '../lazyLoadMicroFrontend';
 export const MicroFrontendRouteComponent: FC<MicroFrontendRouteProps> = ({
   host,
   microFrontendName,
+  path,
   ...props
 }) => (
   <Route
     {...props}
-    component={lazyLoadMicroFrontend({ host, microFrontendName })}
+    component={lazyLoadMicroFrontend({
+      host,
+      microFrontendName,
+      path,
+    })}
+    path={path}
   />
 );
 

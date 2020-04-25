@@ -1,3 +1,6 @@
+/* eslint-disable global-require */
+/* eslint-disable import/no-dynamic-require */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import React, { ComponentType } from 'react';
 import ReactDOM from 'react-dom';
 import { History, createBrowserHistory } from 'history';
@@ -10,10 +13,15 @@ const renderApp = (
   containerId: string,
   App: ComponentType<MicroFrontendAppProps>,
   history: History,
+  microFrontendPath: string,
   isMicroFrontend: boolean,
 ) => {
   ReactDOM.render(
-    <App history={history} isMicroFrontend={isMicroFrontend} />,
+    <App
+      history={history}
+      isMicroFrontend={isMicroFrontend}
+      microFrontendPath={microFrontendPath}
+    />,
     document.getElementById(containerId),
   );
 };
@@ -30,8 +38,14 @@ const registerApp = (
     );
   }
   registries.set(name, {
-    render: history => {
-      renderApp(generateContainerId(name), App, history, true);
+    render: (history, microFrontendPath) => {
+      renderApp(
+        generateContainerId(name),
+        App,
+        history,
+        microFrontendPath,
+        true,
+      );
       callback?.();
     },
     unmount: () => {
@@ -43,15 +57,16 @@ const registerApp = (
 };
 
 const bootstrapMicroFrontend = (
-  name: string,
   App: ComponentType<MicroFrontendAppProps>,
   callback?: VoidFunction,
   rootId = 'root',
 ) => {
+  const { name } = require(`${process.cwd()}/package.json`);
+
   if (isLoadedAsMicroFrontend(name)) {
     registerApp(name, App, callback);
   } else {
-    renderApp(rootId, App, createBrowserHistory(), false);
+    renderApp(rootId, App, createBrowserHistory(), '', false);
   }
 };
 

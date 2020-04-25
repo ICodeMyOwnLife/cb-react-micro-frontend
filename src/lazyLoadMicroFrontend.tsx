@@ -33,9 +33,11 @@ const fetchScripts = (manifest: Manifest, host: string, scriptId: string) =>
 const lazyLoadMicroFrontend = ({
   host,
   microFrontendName,
+  path,
 }: {
   host: string;
   microFrontendName: string;
+  path: string;
 }) =>
   lazy(async () => {
     setMicroFrontendInfo(microFrontendName, host);
@@ -45,7 +47,12 @@ const lazyLoadMicroFrontend = ({
       await fetchScripts(manifest, host, scriptId);
     }
     const Component: FC<{ history: History }> = ({ history }) => (
-      <MicroFrontend history={history} host={host} name={microFrontendName} />
+      <MicroFrontend
+        history={history}
+        host={host}
+        name={microFrontendName}
+        path={path}
+      />
     );
     return { default: Component };
   });

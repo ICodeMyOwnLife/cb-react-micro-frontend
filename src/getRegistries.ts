@@ -20,7 +20,7 @@ interface MicroFrontendRegistry {
 }
 
 interface RenderMicroFrontend {
-  (history: History): void;
+  (history: History, microFrontendPath: string): void;
 }
 
 interface UnmountMicroFrontend {

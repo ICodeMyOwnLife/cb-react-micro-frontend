@@ -13,36 +13,36 @@ const getRegistries = () => {
 };
 
 /* eslint-disable no-underscore-dangle */
-const glo = global;
+const win = window;
 const mfInfoKey = '_mfInfo';
-const isLoadedAsMicroFrontend = (name) => { var _a; return name === ((_a = glo[mfInfoKey]) === null || _a === void 0 ? void 0 : _a.name); };
+const isLoadedAsMicroFrontend = (name) => { var _a; return name === ((_a = win[mfInfoKey]) === null || _a === void 0 ? void 0 : _a.name); };
 const removeMicroFrontendInfo = (name) => {
     var _a;
-    if (!name || ((_a = glo[mfInfoKey]) === null || _a === void 0 ? void 0 : _a.name) === name) {
-        glo[mfInfoKey] = undefined;
+    if (!name || ((_a = win[mfInfoKey]) === null || _a === void 0 ? void 0 : _a.name) === name) {
+        win[mfInfoKey] = undefined;
         document.cookie = `${mfInfoKey}=; Max-Age=-99999999;`;
     }
 };
 const setMicroFrontendInfo = (name, host) => {
     const info = { host, name };
-    glo[mfInfoKey] = info;
-    const expires = new Date(Date.now() + 10 * 365 * 60 * 60 * 1000);
+    win[mfInfoKey] = info;
+    const expires = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000);
     document.cookie = `${mfInfoKey}=${JSON.stringify(info)}; expires=${expires.toUTCString()}; path=/`;
 };
 
-const renderMicroFrontend = ({ history, name, }) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.render(history); };
+const renderMicroFrontend = (name, history, microFrontendPath) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.render(history, microFrontendPath); };
 const unmountMicroFrontend = ({ name }) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.unmount(); };
-const useMicroFrontend = ({ history, host, name, }) => useEffect(() => {
+const useMicroFrontend = ({ history, host, name, path, }) => useEffect(() => {
     setMicroFrontendInfo(name, host);
-    renderMicroFrontend({ history, name });
+    renderMicroFrontend(name, history, path);
     return () => {
         unmountMicroFrontend({ name });
         removeMicroFrontendInfo(name);
     };
-}, [history, host, name]);
+}, [history, host, name, path]);
 
-const MicroFrontendComponent = ({ history, host, name, }) => {
-    useMicroFrontend({ history, host, name });
+const MicroFrontendComponent = ({ history, host, name, path, }) => {
+    useMicroFrontend({ history, host, name, path });
     return React.createElement("main", { id: generateContainerId(name) });
 };
 const MicroFrontend = memo(MicroFrontendComponent);
@@ -98,20 +98,24 @@ const fetchScripts = (manifest, host, scriptId) => new Promise(resolve => {
         document.head.appendChild(script);
     });
 });
-const lazyLoadMicroFrontend = ({ host, microFrontendName, }) => lazy(async () => {
+const lazyLoadMicroFrontend = ({ host, microFrontendName, path, }) => lazy(async () => {
     setMicroFrontendInfo(microFrontendName, host);
     const scriptId = generateScriptId(microFrontendName);
     if (!document.getElementById(scriptId)) {
         const manifest = await fetchManifest(host);
         await fetchScripts(manifest, host, scriptId);
     }
-    const Component = ({ history }) => (React.createElement(MicroFrontend, { history: history, host: host, name: microFrontendName }));
+    const Component = ({ history }) => (React.createElement(MicroFrontend, { history: history, host: host, name: microFrontendName, path: path }));
     return { default: Component };
 });
 
 const MicroFrontendRouteComponent = (_a) => {
-    var { host, microFrontendName } = _a, props = __rest(_a, ["host", "microFrontendName"]);
-    return (React.createElement(Route, Object.assign({}, props, { component: lazyLoadMicroFrontend({ host, microFrontendName }) })));
+    var { host, microFrontendName, path } = _a, props = __rest(_a, ["host", "microFrontendName", "path"]);
+    return (React.createElement(Route, Object.assign({}, props, { component: lazyLoadMicroFrontend({
+            host,
+            microFrontendName,
+            path,
+        }), path: path })));
 };
 const MicroFrontendRoute = memo(MicroFrontendRouteComponent);
 MicroFrontendRoute.displayName = 'MicroFrontendRoute';
@@ -125,8 +129,9 @@ const bootstrapContainer = () => {
     removeMicroFrontendInfo();
 };
 
-const renderApp = (containerId, App, history, isMicroFrontend) => {
-    ReactDOM.render(React.createElement(App, { history: history, isMicroFrontend: isMicroFrontend }), document.getElementById(containerId));
+/* eslint-disable global-require */
+const renderApp = (containerId, App, history, microFrontendPath, isMicroFrontend) => {
+    ReactDOM.render(React.createElement(App, { history: history, isMicroFrontend: isMicroFrontend, microFrontendPath: microFrontendPath }), document.getElementById(containerId));
 };
 const registerApp = (name, App, callback) => {
     const registries = getRegistries();
@@ -134,8 +139,8 @@ const registerApp = (name, App, callback) => {
         console.warn(`Register Micro Frontend with the same name '${name}'. It's probable a mistake.`);
     }
     registries.set(name, {
-        render: history => {
-            renderApp(generateContainerId(name), App, history, true);
+        render: (history, microFrontendPath) => {
+            renderApp(generateContainerId(name), App, history, microFrontendPath, true);
             callback === null || callback === void 0 ? void 0 : callback();
         },
         unmount: () => {
@@ -143,12 +148,13 @@ const registerApp = (name, App, callback) => {
         },
     });
 };
-const bootstrapMicroFrontend = (name, App, callback, rootId = 'root') => {
+const bootstrapMicroFrontend = (App, callback, rootId = 'root') => {
+    const { name } = require(`${process.cwd()}/package.json`);
     if (isLoadedAsMicroFrontend(name)) {
         registerApp(name, App, callback);
     }
     else {
-        renderApp(rootId, App, createBrowserHistory(), false);
+        renderApp(rootId, App, createBrowserHistory(), '', false);
     }
 };
 

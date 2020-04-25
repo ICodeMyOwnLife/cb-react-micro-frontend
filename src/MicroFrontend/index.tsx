@@ -7,8 +7,9 @@ export const MicroFrontendComponent: FC<MicroFrontendProps> = ({
   history,
   host,
   name,
+  path,
 }) => {
-  useMicroFrontend({ history, host, name });
+  useMicroFrontend({ history, host, name, path });
   return <main id={generateContainerId(name)} />;
 };
 
