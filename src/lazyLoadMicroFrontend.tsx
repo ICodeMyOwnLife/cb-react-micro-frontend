@@ -24,6 +24,7 @@ const fetchScripts = (manifest: Manifest, host: string, scriptId: string) =>
       const script = document.createElement('script');
       const entryUrl = resolveUrl(host, entry);
       script.src = entryUrl;
+      script.async = true;
       if (entryUrl === mainJsUrl) script.id = scriptId;
       script.onload = () => {
         count += 1;
