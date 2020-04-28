@@ -14,13 +14,13 @@ const fetchManifest = async (host: string) => {
 };
 
 const fetchScripts = (manifest: Manifest, host: string, scriptId: string) =>
-  new Promise<void>(resolve => {
+  new Promise<void>((resolve) => {
     let count = 0;
     const mainJsUrl = resolveUrl(host, manifest.files['main.js']);
-    const scriptEntries = manifest.entrypoints.filter(entry =>
+    const scriptEntries = manifest.entrypoints.filter((entry) =>
       entry.endsWith('.js'),
     );
-    scriptEntries.forEach(entry => {
+    scriptEntries.forEach((entry) => {
       const script = document.createElement('script');
       const entryUrl = resolveUrl(host, entry);
       script.src = entryUrl;

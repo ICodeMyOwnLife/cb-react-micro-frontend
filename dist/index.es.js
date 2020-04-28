@@ -12,22 +12,23 @@ const getRegistries = () => {
     return win._mfRegistries;
 };
 
+var f="_mfInfo";
+
 /* eslint-disable no-underscore-dangle */
 const win = window;
-const mfInfoKey = '_mfInfo';
-const isLoadedAsMicroFrontend = (name) => { var _a; return name === ((_a = win[mfInfoKey]) === null || _a === void 0 ? void 0 : _a.name); };
+const isLoadedAsMicroFrontend = (name) => { var _a; return name === ((_a = win[f]) === null || _a === void 0 ? void 0 : _a.name); };
 const removeMicroFrontendInfo = (name) => {
     var _a;
-    if (!name || ((_a = win[mfInfoKey]) === null || _a === void 0 ? void 0 : _a.name) === name) {
-        win[mfInfoKey] = undefined;
-        document.cookie = `${mfInfoKey}=; Max-Age=-99999999;`;
+    if (!name || ((_a = win[f]) === null || _a === void 0 ? void 0 : _a.name) === name) {
+        win[f] = undefined;
+        document.cookie = `${f}=; Max-Age=-99999999;`;
     }
 };
 const setMicroFrontendInfo = (name, host) => {
     const info = { host, name };
-    win[mfInfoKey] = info;
+    win[f] = info;
     const expires = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000);
-    document.cookie = `${mfInfoKey}=${JSON.stringify(info)}; expires=${expires.toUTCString()}; path=/`;
+    document.cookie = `${f}=${JSON.stringify(info)}; expires=${expires.toUTCString()}; path=/`;
 };
 
 const renderMicroFrontend = (name, history, microFrontendPath) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.render(history, microFrontendPath); };
@@ -81,11 +82,11 @@ const fetchManifest = async (host) => {
     const res = await fetch(resolveUrl(host, '/asset-manifest.json'));
     return res.json();
 };
-const fetchScripts = (manifest, host, scriptId) => new Promise(resolve => {
+const fetchScripts = (manifest, host, scriptId) => new Promise((resolve) => {
     let count = 0;
     const mainJsUrl = resolveUrl(host, manifest.files['main.js']);
-    const scriptEntries = manifest.entrypoints.filter(entry => entry.endsWith('.js'));
-    scriptEntries.forEach(entry => {
+    const scriptEntries = manifest.entrypoints.filter((entry) => entry.endsWith('.js'));
+    scriptEntries.forEach((entry) => {
         const script = document.createElement('script');
         const entryUrl = resolveUrl(host, entry);
         script.src = entryUrl;
@@ -123,7 +124,7 @@ const MicroFrontendRoute = memo(MicroFrontendRouteComponent);
 MicroFrontendRoute.displayName = 'MicroFrontendRoute';
 
 const MicroFrontendRoutesComponent = ({ fallback, routeProps, }) => (React.createElement(Switch, null,
-    React.createElement(Suspense, { fallback: fallback }, routeProps.map(props => (React.createElement(MicroFrontendRoute, Object.assign({}, props, { key: props.microFrontendName })))))));
+    React.createElement(Suspense, { fallback: fallback }, routeProps.map((props) => (React.createElement(MicroFrontendRoute, Object.assign({}, props, { key: props.microFrontendName })))))));
 const MicroFrontendRoutes = memo(MicroFrontendRoutesComponent);
 MicroFrontendRoutes.displayName = 'MicroFrontendRoutes';
 

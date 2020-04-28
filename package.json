@@ -1,43 +1,83 @@
 {
   "name": "cb-react-micro-frontend",
-  "version": "0.0.19",
-  "description": "React micro-frontend core",
-  "repository": "https://github.com/ICodeMyOwnLife/cb-react-micro-frontend.git",
+  "version": "0.0.22",
+  "description": "Reusable functions for setting up micro-frontends and containers",
   "author": "Hien CB",
+  "repository": "https://github.com/ICodeMyOwnLife/cb-react-micro-frontend.git",
   "license": "MIT",
+  "private": false,
   "source": "src/index.ts",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rollup -c -w",
-    "build:config": "tsc rollup.config.ts --target es2017 --module es2015 --moduleResolution node --skipLibCheck --allowSyntheticDefaultImports -w",
-    "prebuild": "rm -rf dist",
+    "build": "rollup -c",
+    "build:config": "tsc rollup.config.ts --target es2017 --module es2015 --moduleResolution node --skipLibCheck --allowSyntheticDefaultImports",
+    "commit": "git-cz",
+    "dev": "microbundle watch --jsx React.createElement",
+    "lint": "eslint 'src/**/*.{ts,tsx}'",
+    "lint:fix": "yarn lint --fix",
+    "prebuild": "del dist",
+    "release": "release-it",
+    "size": "yarn build && size-limit",
     "type-check": "tsc --noEmit"
   },
+  "dependencies": {
+    "cb-react-micro-frontend-core": "^0.0.3"
+  },
   "devDependencies": {
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
+    "@rollup/plugin-node-resolve": "^7.1.3",
+    "@size-limit/preset-small-lib": "^4.3.1",
     "@types/history": "^4.7.5",
-    "@types/node": "^13.13.2",
+    "@types/node": "^13.13.4",
     "@types/react": "^16.9.34",
-    "@types/react-dom": "^16.9.6",
-    "@types/react-router": "^5.1.5",
+    "@types/react-dom": "^16.9.7",
+    "@types/react-router": "^5.1.7",
+    "commitizen": "^4.0.3",
+    "cz-conventional-changelog": "^3.1.0",
+    "del-cli": "^3.0.0",
     "eslint": "^6.8.0",
     "eslint-config-react-ts": "^2.1.0",
     "history": "^4.10.1",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.8",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router": "^5.1.2",
-    "rollup": "^2.7.2",
+    "release-it": "^13.0.2",
+    "rollup": "^2.7.3",
     "rollup-plugin-cleanup": "^3.1.1",
     "rollup-plugin-typescript2": "^0.27.0",
+    "size-limit": "^4.3.1",
     "typescript": "^3.8.3"
   },
   "peerDependencies": {
     "history": "^4.10.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "react": "> 16.8.0",
+    "react-dom": "> 16.8.0",
     "react-router": "^5.1.2"
   },
-  "dependencies": {
-    "cb-react-micro-frontend-core": "^0.0.3"
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "yarn type-check && yarn lint-staged && yarn size"
+    }
+  },
+  "lint-staged": {
+    "{*.{json,md}}": [
+      "prettier --write"
+    ],
+    "*.{js,jsx,ts,tsx}": [
+      "yarn lint:fix"
+    ]
+  },
+  "engines": {
+    "node": ">=12.0.0"
   }
 }

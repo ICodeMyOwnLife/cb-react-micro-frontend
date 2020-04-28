@@ -1,0 +1,6 @@
+[
+  {
+    "path": "dist/index.es.js",
+    "limit": "2 kb"
+  }
+]
