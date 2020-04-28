@@ -9,7 +9,7 @@ export const MicroFrontendRoutesComponent: FC<MicroFrontendRoutesProps> = ({
 }) => (
   <Switch>
     <Suspense fallback={fallback}>
-      {routeProps.map((props) => (
+      {routeProps.map(props => (
         <MicroFrontendRoute {...props} key={props.microFrontendName} />
       ))}
     </Suspense>

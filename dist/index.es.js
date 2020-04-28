@@ -82,23 +82,42 @@ const fetchManifest = async (host) => {
     const res = await fetch(resolveUrl(host, '/asset-manifest.json'));
     return res.json();
 };
-const fetchScripts = (manifest, host, scriptId) => new Promise((resolve) => {
+const loadScriptEntry = (src, id, handleLoad, handleError) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+    if (id)
+        script.id = id;
+    script.onload = handleLoad;
+    script.onerror = handleError;
+    document.head.appendChild(script);
+};
+const loadStyleEntry = (href, handleDone) => {
+    const link = document.createElement('link');
+    link.href = href;
+    link.rel = 'text/css';
+    link.onload = handleDone;
+    link.onerror = handleDone;
+    document.head.appendChild(link);
+};
+const loadEntryPoints = (manifest, host, scriptId) => new Promise((resolve, reject) => {
     let count = 0;
     const mainJsUrl = resolveUrl(host, manifest.files['main.js']);
-    const scriptEntries = manifest.entrypoints.filter((entry) => entry.endsWith('.js'));
-    scriptEntries.forEach((entry) => {
-        const script = document.createElement('script');
+    const scriptEntries = manifest.entrypoints.filter(entry => entry.endsWith('.js'));
+    const styleEntries = manifest.entrypoints.filter(entry => entry.endsWith('.css'));
+    const handleLoad = () => {
+        count += 1;
+        if (count === scriptEntries.length + styleEntries.length)
+            resolve();
+    };
+    const handleError = (_e, _src, _lineNo, _colNo, err) => reject(err);
+    scriptEntries.forEach(entry => {
         const entryUrl = resolveUrl(host, entry);
-        script.src = entryUrl;
-        script.async = true;
-        if (entryUrl === mainJsUrl)
-            script.id = scriptId;
-        script.onload = () => {
-            count += 1;
-            if (count === scriptEntries.length)
-                resolve();
-        };
-        document.head.appendChild(script);
+        loadScriptEntry(entryUrl, entryUrl === mainJsUrl && scriptId, handleLoad, handleError);
+    });
+    styleEntries.forEach(entry => {
+        const entryUrl = resolveUrl(host, entry);
+        loadStyleEntry(entryUrl, handleLoad);
     });
 });
 const lazyLoadMicroFrontend = ({ host, microFrontendName, path, }) => lazy(async () => {
@@ -106,7 +125,7 @@ const lazyLoadMicroFrontend = ({ host, microFrontendName, path, }) => lazy(async
     const scriptId = generateScriptId(microFrontendName);
     if (!document.getElementById(scriptId)) {
         const manifest = await fetchManifest(host);
-        await fetchScripts(manifest, host, scriptId);
+        await loadEntryPoints(manifest, host, scriptId);
     }
     const Component = ({ history }) => (React.createElement(MicroFrontend, { history: history, host: host, name: microFrontendName, path: path }));
     return { default: Component };
@@ -124,7 +143,7 @@ const MicroFrontendRoute = memo(MicroFrontendRouteComponent);
 MicroFrontendRoute.displayName = 'MicroFrontendRoute';
 
 const MicroFrontendRoutesComponent = ({ fallback, routeProps, }) => (React.createElement(Switch, null,
-    React.createElement(Suspense, { fallback: fallback }, routeProps.map((props) => (React.createElement(MicroFrontendRoute, Object.assign({}, props, { key: props.microFrontendName })))))));
+    React.createElement(Suspense, { fallback: fallback }, routeProps.map(props => (React.createElement(MicroFrontendRoute, Object.assign({}, props, { key: props.microFrontendName })))))));
 const MicroFrontendRoutes = memo(MicroFrontendRoutesComponent);
 MicroFrontendRoutes.displayName = 'MicroFrontendRoutes';
 

@@ -13,24 +13,63 @@ const fetchManifest = async (host: string) => {
   return res.json() as Promise<Manifest>;
 };
 
-const fetchScripts = (manifest: Manifest, host: string, scriptId: string) =>
-  new Promise<void>((resolve) => {
+const loadScriptEntry = (
+  src: string,
+  id: string | undefined | false,
+  handleLoad: VoidFunction,
+  handleError: OnErrorEventHandlerNonNull,
+) => {
+  const script = document.createElement('script');
+  script.src = src;
+  script.async = true;
+  if (id) script.id = id;
+  script.onload = handleLoad;
+  script.onerror = handleError;
+  document.head.appendChild(script);
+};
+
+const loadStyleEntry = (href: string, handleDone: VoidFunction) => {
+  const link = document.createElement('link');
+  link.href = href;
+  link.rel = 'text/css';
+  link.onload = handleDone;
+  link.onerror = handleDone;
+  document.head.appendChild(link);
+};
+
+const loadEntryPoints = (manifest: Manifest, host: string, scriptId: string) =>
+  new Promise<void>((resolve, reject) => {
     let count = 0;
     const mainJsUrl = resolveUrl(host, manifest.files['main.js']);
-    const scriptEntries = manifest.entrypoints.filter((entry) =>
+    const scriptEntries = manifest.entrypoints.filter(entry =>
       entry.endsWith('.js'),
     );
-    scriptEntries.forEach((entry) => {
-      const script = document.createElement('script');
+    const styleEntries = manifest.entrypoints.filter(entry =>
+      entry.endsWith('.css'),
+    );
+    const handleLoad = () => {
+      count += 1;
+      if (count === scriptEntries.length + styleEntries.length) resolve();
+    };
+    const handleError: OnErrorEventHandlerNonNull = (
+      _e,
+      _src,
+      _lineNo,
+      _colNo,
+      err,
+    ) => reject(err);
+    scriptEntries.forEach(entry => {
       const entryUrl = resolveUrl(host, entry);
-      script.src = entryUrl;
-      script.async = true;
-      if (entryUrl === mainJsUrl) script.id = scriptId;
-      script.onload = () => {
-        count += 1;
-        if (count === scriptEntries.length) resolve();
-      };
-      document.head.appendChild(script);
+      loadScriptEntry(
+        entryUrl,
+        entryUrl === mainJsUrl && scriptId,
+        handleLoad,
+        handleError,
+      );
+    });
+    styleEntries.forEach(entry => {
+      const entryUrl = resolveUrl(host, entry);
+      loadStyleEntry(entryUrl, handleLoad);
     });
   });
 
@@ -48,7 +87,7 @@ const lazyLoadMicroFrontend = ({
     const scriptId = generateScriptId(microFrontendName);
     if (!document.getElementById(scriptId)) {
       const manifest = await fetchManifest(host);
-      await fetchScripts(manifest, host, scriptId);
+      await loadEntryPoints(manifest, host, scriptId);
     }
     const Component: FC<{ history: History }> = ({ history }) => (
       <MicroFrontend
