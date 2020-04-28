@@ -272,6 +272,11 @@ callsites@^3.0.0:
   resolved "https://registry.yarnpkg.com/callsites/-/callsites-3.1.0.tgz#b3630abd8943432f54b3f0519238e33cd7df2f73"
   integrity sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==
 
+cb-react-micro-frontend-core@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/cb-react-micro-frontend-core/-/cb-react-micro-frontend-core-0.0.3.tgz#2526434de8389613a0bdc5dd29f4257828c9aed6"
+  integrity sha512-6aZh4Lg91yEVH+IOX1nohO+On26ekeVDfEXbQteChsTpykyWe+cKPAU3AJvhgHDOMO4qJX0vT0EaVD3pcuhm/g==
+
 chalk@^2.0.0, chalk@^2.1.0:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.2.tgz#cd42541677a54333cf541a49108c1432b44c9424"
