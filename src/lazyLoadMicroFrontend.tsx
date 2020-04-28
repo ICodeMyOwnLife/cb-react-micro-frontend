@@ -13,65 +13,41 @@ const fetchManifest = async (host: string) => {
   return res.json() as Promise<Manifest>;
 };
 
-const loadScriptEntry = (
-  src: string,
-  id: string | undefined | false,
-  handleLoad: VoidFunction,
-  handleError: OnErrorEventHandlerNonNull,
-) => {
-  const script = document.createElement('script');
-  script.src = src;
-  script.async = true;
-  if (id) script.id = id;
-  script.onload = handleLoad;
-  script.onerror = handleError;
-  document.head.appendChild(script);
-};
-
-const loadStyleEntry = (href: string, handleDone: VoidFunction) => {
-  const link = document.createElement('link');
-  link.href = href;
-  link.rel = 'text/css';
-  link.onload = handleDone;
-  link.onerror = handleDone;
-  document.head.appendChild(link);
-};
-
-const loadEntryPoints = (manifest: Manifest, host: string, scriptId: string) =>
+const loadScripts = (manifest: Manifest, host: string, scriptId: string) =>
   new Promise<void>((resolve, reject) => {
     let count = 0;
     const mainJsUrl = resolveUrl(host, manifest.files['main.js']);
     const scriptEntries = manifest.entrypoints.filter(entry =>
       entry.endsWith('.js'),
     );
-    const styleEntries = manifest.entrypoints.filter(entry =>
-      entry.endsWith('.css'),
-    );
-    const handleLoad = () => {
-      count += 1;
-      if (count === scriptEntries.length + styleEntries.length) resolve();
-    };
-    const handleError: OnErrorEventHandlerNonNull = (
-      _e,
-      _src,
-      _lineNo,
-      _colNo,
-      err,
-    ) => reject(err);
     scriptEntries.forEach(entry => {
       const entryUrl = resolveUrl(host, entry);
-      loadScriptEntry(
-        entryUrl,
-        entryUrl === mainJsUrl && scriptId,
-        handleLoad,
-        handleError,
-      );
-    });
-    styleEntries.forEach(entry => {
-      const entryUrl = resolveUrl(host, entry);
-      loadStyleEntry(entryUrl, handleLoad);
+      const script = document.createElement('script');
+      script.src = entryUrl;
+      script.async = true;
+      if (entryUrl === mainJsUrl) script.id = scriptId;
+      script.onload = () => {
+        count += 1;
+        if (count === scriptEntries.length) resolve();
+      };
+      script.onerror = (_e, _src, _lineNo, _colNo, err) => reject(err);
+      document.head.appendChild(script);
     });
   });
+
+const loadStyles = (manifest: Manifest, host: string) => {
+  const styleEntries = manifest.entrypoints.filter(entry =>
+    entry.endsWith('.css'),
+  );
+
+  styleEntries.forEach(entry => {
+    const entryUrl = resolveUrl(host, entry);
+    const link = document.createElement('link');
+    link.href = entryUrl;
+    link.rel = 'text/css';
+    document.head.appendChild(link);
+  });
+};
 
 const lazyLoadMicroFrontend = ({
   host,
@@ -87,7 +63,8 @@ const lazyLoadMicroFrontend = ({
     const scriptId = generateScriptId(microFrontendName);
     if (!document.getElementById(scriptId)) {
       const manifest = await fetchManifest(host);
-      await loadEntryPoints(manifest, host, scriptId);
+      await loadScripts(manifest, host, scriptId);
+      loadStyles(manifest, host);
     }
     const Component: FC<{ history: History }> = ({ history }) => (
       <MicroFrontend

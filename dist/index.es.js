@@ -82,50 +82,43 @@ const fetchManifest = async (host) => {
     const res = await fetch(resolveUrl(host, '/asset-manifest.json'));
     return res.json();
 };
-const loadScriptEntry = (src, id, handleLoad, handleError) => {
-    const script = document.createElement('script');
-    script.src = src;
-    script.async = true;
-    if (id)
-        script.id = id;
-    script.onload = handleLoad;
-    script.onerror = handleError;
-    document.head.appendChild(script);
-};
-const loadStyleEntry = (href, handleDone) => {
-    const link = document.createElement('link');
-    link.href = href;
-    link.rel = 'text/css';
-    link.onload = handleDone;
-    link.onerror = handleDone;
-    document.head.appendChild(link);
-};
-const loadEntryPoints = (manifest, host, scriptId) => new Promise((resolve, reject) => {
+const loadScripts = (manifest, host, scriptId) => new Promise((resolve, reject) => {
     let count = 0;
     const mainJsUrl = resolveUrl(host, manifest.files['main.js']);
     const scriptEntries = manifest.entrypoints.filter(entry => entry.endsWith('.js'));
-    const styleEntries = manifest.entrypoints.filter(entry => entry.endsWith('.css'));
-    const handleLoad = () => {
-        count += 1;
-        if (count === scriptEntries.length + styleEntries.length)
-            resolve();
-    };
-    const handleError = (_e, _src, _lineNo, _colNo, err) => reject(err);
     scriptEntries.forEach(entry => {
         const entryUrl = resolveUrl(host, entry);
-        loadScriptEntry(entryUrl, entryUrl === mainJsUrl && scriptId, handleLoad, handleError);
-    });
-    styleEntries.forEach(entry => {
-        const entryUrl = resolveUrl(host, entry);
-        loadStyleEntry(entryUrl, handleLoad);
+        const script = document.createElement('script');
+        script.src = entryUrl;
+        script.async = true;
+        if (entryUrl === mainJsUrl)
+            script.id = scriptId;
+        script.onload = () => {
+            count += 1;
+            if (count === scriptEntries.length)
+                resolve();
+        };
+        script.onerror = (_e, _src, _lineNo, _colNo, err) => reject(err);
+        document.head.appendChild(script);
     });
 });
+const loadStyles = (manifest, host) => {
+    const styleEntries = manifest.entrypoints.filter(entry => entry.endsWith('.css'));
+    styleEntries.forEach(entry => {
+        const entryUrl = resolveUrl(host, entry);
+        const link = document.createElement('link');
+        link.href = entryUrl;
+        link.rel = 'text/css';
+        document.head.appendChild(link);
+    });
+};
 const lazyLoadMicroFrontend = ({ host, microFrontendName, path, }) => lazy(async () => {
     setMicroFrontendInfo(microFrontendName, host);
     const scriptId = generateScriptId(microFrontendName);
     if (!document.getElementById(scriptId)) {
         const manifest = await fetchManifest(host);
-        await loadEntryPoints(manifest, host, scriptId);
+        await loadScripts(manifest, host, scriptId);
+        loadStyles(manifest, host);
     }
     const Component = ({ history }) => (React.createElement(MicroFrontend, { history: history, host: host, name: microFrontendName, path: path }));
     return { default: Component };
