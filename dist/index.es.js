@@ -108,7 +108,8 @@ const loadStyles = (manifest, host) => {
         const entryUrl = resolveUrl(host, entry);
         const link = document.createElement('link');
         link.href = entryUrl;
-        link.rel = 'text/css';
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
         document.head.appendChild(link);
     });
 };
