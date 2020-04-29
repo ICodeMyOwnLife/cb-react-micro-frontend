@@ -23,7 +23,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "cb-react-micro-frontend-core": "^0.0.3"
+    "cb-react-micro-frontend-core": "^0.0.5"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
@@ -42,11 +42,11 @@
     "eslint-config-react-ts": "^2.1.0",
     "history": "^4.10.1",
     "husky": "^4.2.3",
-    "lint-staged": "^10.0.8",
+    "lint-staged": "^10.2.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router": "^5.1.2",
-    "release-it": "^13.0.2",
+    "release-it": "^13.5.7",
     "rollup": "^2.7.3",
     "rollup-plugin-cleanup": "^3.1.1",
     "rollup-plugin-typescript2": "^0.27.0",

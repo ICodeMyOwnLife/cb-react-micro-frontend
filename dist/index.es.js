@@ -12,23 +12,23 @@ const getRegistries = () => {
     return win._mfRegistries;
 };
 
-var f="_mfInfo";
+var _="_mfInfo";
 
 /* eslint-disable no-underscore-dangle */
 const win = window;
-const isLoadedAsMicroFrontend = (name) => { var _a; return name === ((_a = win[f]) === null || _a === void 0 ? void 0 : _a.name); };
+const isLoadedAsMicroFrontend = (name) => { var _a; return name === ((_a = win[_]) === null || _a === void 0 ? void 0 : _a.name); };
 const removeMicroFrontendInfo = (name) => {
     var _a;
-    if (!name || ((_a = win[f]) === null || _a === void 0 ? void 0 : _a.name) === name) {
-        win[f] = undefined;
-        document.cookie = `${f}=; Max-Age=-99999999;`;
+    if (!name || ((_a = win[_]) === null || _a === void 0 ? void 0 : _a.name) === name) {
+        win[_] = undefined;
+        document.cookie = `${_}=; Max-Age=-99999999;`;
     }
 };
 const setMicroFrontendInfo = (name, host) => {
     const info = { host, name };
-    win[f] = info;
+    win[_] = info;
     const expires = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000);
-    document.cookie = `${f}=${JSON.stringify(info)}; expires=${expires.toUTCString()}; path=/`;
+    document.cookie = `${_}=${JSON.stringify(info)}; expires=${expires.toUTCString()}; path=/`;
 };
 
 const renderMicroFrontend = (name, history, microFrontendPath) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.render(history, microFrontendPath); };
