@@ -14,7 +14,6 @@ const getRegistries = () => {
 
 var _="_mfInfo";
 
-/* eslint-disable no-underscore-dangle */
 const win = window;
 const isLoadedAsMicroFrontend = (name) => { var _a; return name === ((_a = win[_]) === null || _a === void 0 ? void 0 : _a.name); };
 const removeMicroFrontendInfo = (name) => {
@@ -27,8 +26,10 @@ const removeMicroFrontendInfo = (name) => {
 const setMicroFrontendInfo = (name, host) => {
     const info = { host, name };
     win[_] = info;
+    const infoText = JSON.stringify(info);
     const expires = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000);
-    document.cookie = `${_}=${JSON.stringify(info)}; expires=${expires.toUTCString()}; path=/`;
+    const expiresText = expires.toUTCString();
+    document.cookie = `${_}=${infoText}; expires=${expiresText}; samesite=strict; path=/`;
 };
 
 const renderMicroFrontend = (name, history, microFrontendPath) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.render(history, microFrontendPath); };
