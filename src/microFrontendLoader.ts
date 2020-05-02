@@ -17,10 +17,10 @@ export const removeMicroFrontendInfo = (name?: string) => {
 export const setMicroFrontendInfo = (name: string, host: string) => {
   const info: MicroFrontendInfo = { host, name };
   win[mfInfoKey] = info;
+  const infoText = JSON.stringify(info);
   const expires = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000);
-  document.cookie = `${mfInfoKey}=${JSON.stringify(
-    info,
-  )}; expires=${expires.toUTCString()}; path=/`;
+  const expiresText = expires.toUTCString();
+  document.cookie = `${mfInfoKey}=${infoText}; expires=${expiresText}; samesite=strict; path=/`;
 };
 
 interface MicroFrontendGlobal
