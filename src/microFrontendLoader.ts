@@ -1,30 +1,30 @@
-/* eslint-disable no-underscore-dangle */
-const win = (window as unknown) as MicroFrontendGlobal;
-const mfInfoKey = '_mfInfo';
+import { MF_INFO_KEY } from 'cb-react-micro-frontend-core';
 
-export const getMicroFrontendInfo = () => win[mfInfoKey];
+const win = (window as unknown) as MicroFrontendGlobal;
+
+export const getMicroFrontendInfo = () => win[MF_INFO_KEY];
 
 export const isLoadedAsMicroFrontend = (name: string) =>
-  name === win[mfInfoKey]?.name;
+  name === win[MF_INFO_KEY]?.name;
 
 export const removeMicroFrontendInfo = (name?: string) => {
-  if (!name || win[mfInfoKey]?.name === name) {
-    win[mfInfoKey] = undefined;
-    document.cookie = `${mfInfoKey}=; Max-Age=-99999999;`;
+  if (!name || win[MF_INFO_KEY]?.name === name) {
+    win[MF_INFO_KEY] = undefined;
+    document.cookie = `${MF_INFO_KEY}=; Max-Age=-99999999;`;
   }
 };
 
 export const setMicroFrontendInfo = (name: string, host: string) => {
   const info: MicroFrontendInfo = { host, name };
-  win[mfInfoKey] = info;
+  win[MF_INFO_KEY] = info;
   const infoText = JSON.stringify(info);
   const expires = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000);
   const expiresText = expires.toUTCString();
-  document.cookie = `${mfInfoKey}=${infoText}; expires=${expiresText}; samesite=strict; path=/`;
+  document.cookie = `${MF_INFO_KEY}=${infoText}; expires=${expiresText}; samesite=strict; path=/`;
 };
 
 interface MicroFrontendGlobal
-  extends Record<typeof mfInfoKey, MicroFrontendInfo | undefined | null> {}
+  extends Record<typeof MF_INFO_KEY, MicroFrontendInfo | undefined | null> {}
 
 interface MicroFrontendInfo {
   host: string;

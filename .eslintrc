@@ -1,1 +1,5 @@
-{ "extends": "react-ts" }
+{
+  "extends": [
+    "react-ts"
+  ]
+}

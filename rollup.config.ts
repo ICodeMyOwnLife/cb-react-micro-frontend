@@ -7,6 +7,7 @@ import {
   WatcherOptions,
 } from 'rollup';
 import typescript from 'rollup-plugin-typescript2';
+import resolve from '@rollup/plugin-node-resolve';
 import cleanup from 'rollup-plugin-cleanup';
 
 const input: InputOption = 'src/index.ts';
@@ -15,6 +16,7 @@ const external: ExternalOption = id =>
 const tsconfig = './tsconfig.json';
 const plugins: Plugin[] = [
   typescript({ tsconfig, clean: true }),
+  resolve(),
   cleanup({ comments: 'none' }),
 ];
 const watch: WatcherOptions = { include: ['src/**'] };

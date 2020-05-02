@@ -13,16 +13,16 @@ const fetchManifest = async (host: string) => {
   return res.json() as Promise<Manifest>;
 };
 
-const fetchScripts = (manifest: Manifest, host: string, scriptId: string) =>
-  new Promise<void>(resolve => {
+const loadScripts = (manifest: Manifest, host: string, scriptId: string) =>
+  new Promise<void>((resolve, reject) => {
     let count = 0;
     const mainJsUrl = resolveUrl(host, manifest.files['main.js']);
     const scriptEntries = manifest.entrypoints.filter(entry =>
       entry.endsWith('.js'),
     );
     scriptEntries.forEach(entry => {
-      const script = document.createElement('script');
       const entryUrl = resolveUrl(host, entry);
+      const script = document.createElement('script');
       script.src = entryUrl;
       script.async = true;
       if (entryUrl === mainJsUrl) script.id = scriptId;
@@ -30,9 +30,25 @@ const fetchScripts = (manifest: Manifest, host: string, scriptId: string) =>
         count += 1;
         if (count === scriptEntries.length) resolve();
       };
+      script.onerror = (_e, _src, _lineNo, _colNo, err) => reject(err);
       document.head.appendChild(script);
     });
   });
+
+const loadStyles = (manifest: Manifest, host: string) => {
+  const styleEntries = manifest.entrypoints.filter(entry =>
+    entry.endsWith('.css'),
+  );
+
+  styleEntries.forEach(entry => {
+    const entryUrl = resolveUrl(host, entry);
+    const link = document.createElement('link');
+    link.href = entryUrl;
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    document.head.appendChild(link);
+  });
+};
 
 const lazyLoadMicroFrontend = ({
   host,
@@ -48,7 +64,8 @@ const lazyLoadMicroFrontend = ({
     const scriptId = generateScriptId(microFrontendName);
     if (!document.getElementById(scriptId)) {
       const manifest = await fetchManifest(host);
-      await fetchScripts(manifest, host, scriptId);
+      await loadScripts(manifest, host, scriptId);
+      loadStyles(manifest, host);
     }
     const Component: FC<{ history: History }> = ({ history }) => (
       <MicroFrontend
