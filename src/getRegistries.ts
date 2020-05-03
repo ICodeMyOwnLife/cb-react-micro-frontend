@@ -1,17 +1,18 @@
-/* eslint-disable no-underscore-dangle */
 import { History } from 'history';
+
+const MF_REGISTRIES_KEY = '_mfRegistries';
 
 const getRegistries = () => {
   const win = (window as unknown) as MicroFrontendWindow;
-  win._mfRegistries =
-    win._mfRegistries || new Map<string, MicroFrontendRegistry>();
-  return win._mfRegistries;
+  win[MF_REGISTRIES_KEY] =
+    win[MF_REGISTRIES_KEY] || new Map<string, MicroFrontendRegistry>();
+  return win[MF_REGISTRIES_KEY];
 };
 
 export default getRegistries;
 
 interface MicroFrontendWindow extends Window {
-  _mfRegistries: Map<string, MicroFrontendRegistry>;
+  [MF_REGISTRIES_KEY]: Map<string, MicroFrontendRegistry>;
 }
 
 interface MicroFrontendRegistry {

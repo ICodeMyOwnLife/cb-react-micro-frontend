@@ -9,15 +9,19 @@ import {
 import typescript from 'rollup-plugin-typescript2';
 import resolve from '@rollup/plugin-node-resolve';
 import cleanup from 'rollup-plugin-cleanup';
+import filesize from 'rollup-plugin-filesize';
 
 const input: InputOption = 'src/index.ts';
 const external: ExternalOption = id =>
-  !!id.match(/^(react|react-dom|history|react-router|react-router-dom)/);
+  !!id.match(
+    /^(react|react-dom|history|react-router|react-router-dom|js-cookie)/,
+  );
 const tsconfig = './tsconfig.json';
 const plugins: Plugin[] = [
   typescript({ tsconfig, clean: true }),
   resolve(),
   cleanup({ comments: 'none' }),
+  filesize(),
 ];
 const watch: WatcherOptions = { include: ['src/**'] };
 

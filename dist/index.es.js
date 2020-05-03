@@ -1,15 +1,17 @@
 import React, { useEffect, memo, lazy, Suspense } from 'react';
+import Cookies from 'js-cookie';
 import { Route, Switch } from 'react-router';
 import ReactDOM from 'react-dom';
 import { createBrowserHistory } from 'history';
 
 const generateContainerId = (name) => `${name}Container`;
 
+const MF_REGISTRIES_KEY = '_mfRegistries';
 const getRegistries = () => {
     const win = window;
-    win._mfRegistries =
-        win._mfRegistries || new Map();
-    return win._mfRegistries;
+    win[MF_REGISTRIES_KEY] =
+        win[MF_REGISTRIES_KEY] || new Map();
+    return win[MF_REGISTRIES_KEY];
 };
 
 var _="_mfInfo";
@@ -20,16 +22,17 @@ const removeMicroFrontendInfo = (name) => {
     var _a;
     if (!name || ((_a = win[_]) === null || _a === void 0 ? void 0 : _a.name) === name) {
         win[_] = undefined;
-        document.cookie = `${_}=; Max-Age=-99999999;`;
+        Cookies.remove(_);
     }
 };
 const setMicroFrontendInfo = (name, host) => {
     const info = { host, name };
     win[_] = info;
-    const infoText = JSON.stringify(info);
-    const expires = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000);
-    const expiresText = expires.toUTCString();
-    document.cookie = `${_}=${infoText}; expires=${expiresText}; samesite=strict; path=/`;
+    Cookies.set(_, info, {
+        expires: 10 * 365,
+        path: '/',
+        sameSite: 'strict',
+    });
 };
 
 const renderMicroFrontend = (name, history, microFrontendPath) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.render(history, microFrontendPath); };
@@ -146,7 +149,6 @@ const bootstrapContainer = () => {
     removeMicroFrontendInfo();
 };
 
-/* eslint-disable global-require */
 const renderApp = (containerId, App, history, microFrontendPath, isMicroFrontend) => {
     ReactDOM.render(React.createElement(App, { history: history, isMicroFrontend: isMicroFrontend, microFrontendPath: microFrontendPath }), document.getElementById(containerId));
 };

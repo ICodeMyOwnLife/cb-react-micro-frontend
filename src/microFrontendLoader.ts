@@ -1,4 +1,5 @@
 import { MF_INFO_KEY } from 'cb-react-micro-frontend-core';
+import Cookies from 'js-cookie';
 
 const win = (window as unknown) as MicroFrontendGlobal;
 
@@ -10,21 +11,23 @@ export const isLoadedAsMicroFrontend = (name: string) =>
 export const removeMicroFrontendInfo = (name?: string) => {
   if (!name || win[MF_INFO_KEY]?.name === name) {
     win[MF_INFO_KEY] = undefined;
-    document.cookie = `${MF_INFO_KEY}=; Max-Age=-99999999;`;
+    Cookies.remove(MF_INFO_KEY);
   }
 };
 
 export const setMicroFrontendInfo = (name: string, host: string) => {
   const info: MicroFrontendInfo = { host, name };
   win[MF_INFO_KEY] = info;
-  const infoText = JSON.stringify(info);
-  const expires = new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000);
-  const expiresText = expires.toUTCString();
-  document.cookie = `${MF_INFO_KEY}=${infoText}; expires=${expiresText}; samesite=strict; path=/`;
+  Cookies.set(MF_INFO_KEY, info, {
+    expires: 10 * 365,
+    path: '/',
+    sameSite: 'strict',
+  });
 };
 
-interface MicroFrontendGlobal
-  extends Record<typeof MF_INFO_KEY, MicroFrontendInfo | undefined | null> {}
+interface MicroFrontendGlobal {
+  [MF_INFO_KEY]: MicroFrontendInfo | undefined;
+}
 
 interface MicroFrontendInfo {
   host: string;

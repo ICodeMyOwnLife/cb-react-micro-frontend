@@ -1,5 +1,6 @@
 import { RouteProps } from 'react-router';
 import { History } from 'history';
+import { OmitFrom } from 'cb-toolset/object';
 
 export interface MicroFrontendAppProps {
   microFrontendPath: string;
@@ -19,5 +20,3 @@ export interface MicroFrontendRouteProps
     OmitFrom<MicroFrontendProps, 'history' | 'name'> {
   microFrontendName: string;
 }
-
-export type OmitFrom<T, TKey extends keyof T> = Omit<T, TKey>;

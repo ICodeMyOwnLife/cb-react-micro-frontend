@@ -1,15 +1,19 @@
 import typescript from 'rollup-plugin-typescript2';
 import resolve from '@rollup/plugin-node-resolve';
 import cleanup from 'rollup-plugin-cleanup';
+import filesize from 'rollup-plugin-filesize';
 
 const input = 'src/index.ts';
 const external = id =>
-  !!id.match(/^(react|react-dom|history|react-router|react-router-dom)/);
+  !!id.match(
+    /^(react|react-dom|history|react-router|react-router-dom|js-cookie)/,
+  );
 const tsconfig = './tsconfig.json';
 const plugins = [
   typescript({ tsconfig, clean: true }),
   resolve(),
   cleanup({ comments: 'none' }),
+  filesize(),
 ];
 const watch = { include: ['src/**'] };
 const esOptions = {

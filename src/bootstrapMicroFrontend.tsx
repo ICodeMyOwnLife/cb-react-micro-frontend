@@ -1,6 +1,3 @@
-/* eslint-disable global-require */
-/* eslint-disable import/no-dynamic-require */
-/* eslint-disable @typescript-eslint/no-var-requires */
 import React, { ComponentType } from 'react';
 import ReactDOM from 'react-dom';
 import { History, createBrowserHistory } from 'history';
