@@ -1,7 +1,7 @@
 import React, { FC, memo } from 'react';
-import { Route } from 'react-router';
-import { MicroFrontendRouteProps } from '../types';
+import { Route } from 'react-router-dom';
 import lazyLoadMicroFrontend from '../lazyLoadMicroFrontend';
+import { MicroFrontendRouteProps } from '../types';
 
 export const MicroFrontendRouteComponent: FC<MicroFrontendRouteProps> = ({
   host,

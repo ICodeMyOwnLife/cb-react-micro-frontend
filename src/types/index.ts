@@ -1,15 +1,12 @@
-import { RouteProps } from 'react-router';
-import { History } from 'history';
+import { RouteProps } from 'react-router-dom';
 import { OmitFrom } from 'cb-toolset/object';
 
 export interface MicroFrontendAppProps {
   microFrontendPath: string;
-  history: History;
   isMicroFrontend: boolean;
 }
 
 export interface MicroFrontendProps {
-  history: History;
   host: string;
   name: string;
   path: string;
@@ -17,6 +14,6 @@ export interface MicroFrontendProps {
 
 export interface MicroFrontendRouteProps
   extends OmitFrom<RouteProps, 'path' | 'render'>,
-    OmitFrom<MicroFrontendProps, 'history' | 'name'> {
+    OmitFrom<MicroFrontendProps, 'name'> {
   microFrontendName: string;
 }

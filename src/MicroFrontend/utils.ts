@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { History } from 'history';
 import getRegistries from '../getRegistries';
 import {
   removeMicroFrontendInfo,
@@ -7,26 +6,18 @@ import {
 } from '../microFrontendLoader';
 import { MicroFrontendProps } from '../types';
 
-const renderMicroFrontend = (
-  name: string,
-  history: History,
-  microFrontendPath: string,
-) => getRegistries().get(name)?.render(history, microFrontendPath);
+const renderMicroFrontend = (name: string, microFrontendPath: string) =>
+  getRegistries().get(name)?.render(microFrontendPath);
 
 const unmountMicroFrontend = ({ name }: { name: string }) =>
   getRegistries().get(name)?.unmount();
 
-export const useMicroFrontend = ({
-  history,
-  host,
-  name,
-  path,
-}: MicroFrontendProps) =>
+export const useMicroFrontend = ({ host, name, path }: MicroFrontendProps) =>
   useEffect(() => {
     setMicroFrontendInfo(name, host);
-    renderMicroFrontend(name, history, path);
+    renderMicroFrontend(name, path);
     return () => {
       unmountMicroFrontend({ name });
       removeMicroFrontendInfo(name);
     };
-  }, [history, host, name, path]);
+  }, [host, name, path]);

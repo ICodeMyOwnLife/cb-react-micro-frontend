@@ -1,8 +1,7 @@
 import React, { useEffect, memo, lazy, Suspense } from 'react';
 import Cookies from 'js-cookie';
-import { Route, Switch } from 'react-router';
+import { Route, Switch, useHistory, Router, BrowserRouter } from 'react-router-dom';
 import ReactDOM from 'react-dom';
-import { createBrowserHistory } from 'history';
 
 const generateContainerId = (name) => `${name}Container`;
 
@@ -35,19 +34,19 @@ const setMicroFrontendInfo = (name, host) => {
     });
 };
 
-const renderMicroFrontend = (name, history, microFrontendPath) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.render(history, microFrontendPath); };
+const renderMicroFrontend = (name, microFrontendPath) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.render(microFrontendPath); };
 const unmountMicroFrontend = ({ name }) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.unmount(); };
-const useMicroFrontend = ({ history, host, name, path, }) => useEffect(() => {
+const useMicroFrontend = ({ host, name, path }) => useEffect(() => {
     setMicroFrontendInfo(name, host);
-    renderMicroFrontend(name, history, path);
+    renderMicroFrontend(name, path);
     return () => {
         unmountMicroFrontend({ name });
         removeMicroFrontendInfo(name);
     };
-}, [history, host, name, path]);
+}, [host, name, path]);
 
-const MicroFrontendComponent = ({ history, host, name, path, }) => {
-    useMicroFrontend({ history, host, name, path });
+const MicroFrontendComponent = ({ host, name, path, }) => {
+    useMicroFrontend({ host, name, path });
     return React.createElement("main", { id: generateContainerId(name) });
 };
 const MicroFrontend = memo(MicroFrontendComponent);
@@ -95,6 +94,7 @@ const loadScripts = (manifest, host, scriptId) => new Promise((resolve, reject) 
         const script = document.createElement('script');
         script.src = entryUrl;
         script.async = true;
+        script.crossOrigin = '';
         if (entryUrl === mainJsUrl)
             script.id = scriptId;
         script.onload = () => {
@@ -125,7 +125,7 @@ const lazyLoadMicroFrontend = ({ host, microFrontendName, path, }) => lazy(async
         await loadScripts(manifest, host, scriptId);
         loadStyles(manifest, host);
     }
-    const Component = ({ history }) => (React.createElement(MicroFrontend, { history: history, host: host, name: microFrontendName, path: path }));
+    const Component = () => (React.createElement(MicroFrontend, { host: host, name: microFrontendName, path: path }));
     return { default: Component };
 });
 
@@ -149,8 +149,17 @@ const bootstrapContainer = () => {
     removeMicroFrontendInfo();
 };
 
-const renderApp = (containerId, App, history, microFrontendPath, isMicroFrontend) => {
-    ReactDOM.render(React.createElement(App, { history: history, isMicroFrontend: isMicroFrontend, microFrontendPath: microFrontendPath }), document.getElementById(containerId));
+const MicroFrontendWrapperComponent = ({ children, }) => {
+    const history = useHistory();
+    return React.createElement(Router, { history: history }, children);
+};
+const MicroFrontendWrapper = memo(MicroFrontendWrapperComponent);
+MicroFrontendWrapper.displayName = 'MicroFrontendWrapper';
+
+const renderApp = (containerId, App, microFrontendPath, isMicroFrontend) => {
+    const Wrapper = isMicroFrontend ? MicroFrontendWrapper : BrowserRouter;
+    ReactDOM.render(React.createElement(Wrapper, null,
+        React.createElement(App, { isMicroFrontend: isMicroFrontend, microFrontendPath: microFrontendPath })), document.getElementById(containerId));
 };
 const registerApp = (name, App, callback) => {
     const registries = getRegistries();
@@ -158,8 +167,8 @@ const registerApp = (name, App, callback) => {
         console.warn(`Register Micro Frontend with the same name '${name}'. It's probable a mistake.`);
     }
     registries.set(name, {
-        render: (history, microFrontendPath) => {
-            renderApp(generateContainerId(name), App, history, microFrontendPath, true);
+        render: microFrontendPath => {
+            renderApp(generateContainerId(name), App, microFrontendPath, true);
             callback === null || callback === void 0 ? void 0 : callback();
         },
         unmount: () => {
@@ -172,7 +181,7 @@ const bootstrapMicroFrontend = (microFrontendName, App, callback, rootId = 'root
         registerApp(microFrontendName, App, callback);
     }
     else {
-        renderApp(rootId, App, createBrowserHistory(), '', false);
+        renderApp(rootId, App, '', false);
     }
 };
 

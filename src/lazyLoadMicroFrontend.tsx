@@ -1,5 +1,4 @@
 import React, { lazy, FC } from 'react';
-import { History } from 'history';
 import MicroFrontend from './MicroFrontend';
 import { setMicroFrontendInfo } from './microFrontendLoader';
 
@@ -25,6 +24,7 @@ const loadScripts = (manifest: Manifest, host: string, scriptId: string) =>
       const script = document.createElement('script');
       script.src = entryUrl;
       script.async = true;
+      script.crossOrigin = '';
       if (entryUrl === mainJsUrl) script.id = scriptId;
       script.onload = () => {
         count += 1;
@@ -67,13 +67,8 @@ const lazyLoadMicroFrontend = ({
       await loadScripts(manifest, host, scriptId);
       loadStyles(manifest, host);
     }
-    const Component: FC<{ history: History }> = ({ history }) => (
-      <MicroFrontend
-        history={history}
-        host={host}
-        name={microFrontendName}
-        path={path}
-      />
+    const Component: FC = () => (
+      <MicroFrontend host={host} name={microFrontendName} path={path} />
     );
     return { default: Component };
   });

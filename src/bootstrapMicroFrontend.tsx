@@ -1,6 +1,7 @@
 import React, { ComponentType } from 'react';
 import ReactDOM from 'react-dom';
-import { History, createBrowserHistory } from 'history';
+import { BrowserRouter } from 'react-router-dom';
+import MicroFrontendWrapper from './MicroFrontendWrapper';
 import getRegistries from './getRegistries';
 import { generateContainerId } from './utils';
 import { MicroFrontendAppProps } from './types';
@@ -9,16 +10,17 @@ import { isLoadedAsMicroFrontend } from './microFrontendLoader';
 const renderApp = (
   containerId: string,
   App: ComponentType<MicroFrontendAppProps>,
-  history: History,
   microFrontendPath: string,
   isMicroFrontend: boolean,
 ) => {
+  const Wrapper = isMicroFrontend ? MicroFrontendWrapper : BrowserRouter;
   ReactDOM.render(
-    <App
-      history={history}
-      isMicroFrontend={isMicroFrontend}
-      microFrontendPath={microFrontendPath}
-    />,
+    <Wrapper>
+      <App
+        isMicroFrontend={isMicroFrontend}
+        microFrontendPath={microFrontendPath}
+      />
+    </Wrapper>,
     document.getElementById(containerId),
   );
 };
@@ -35,14 +37,8 @@ const registerApp = (
     );
   }
   registries.set(name, {
-    render: (history, microFrontendPath) => {
-      renderApp(
-        generateContainerId(name),
-        App,
-        history,
-        microFrontendPath,
-        true,
-      );
+    render: microFrontendPath => {
+      renderApp(generateContainerId(name), App, microFrontendPath, true);
       callback?.();
     },
     unmount: () => {
@@ -62,7 +58,7 @@ const bootstrapMicroFrontend = (
   if (isLoadedAsMicroFrontend(microFrontendName)) {
     registerApp(microFrontendName, App, callback);
   } else {
-    renderApp(rootId, App, createBrowserHistory(), '', false);
+    renderApp(rootId, App, '', false);
   }
 };
 

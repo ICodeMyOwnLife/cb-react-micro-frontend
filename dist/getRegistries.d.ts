@@ -1,4 +1,3 @@
-import { History } from 'history';
 declare const getRegistries: () => Map<string, MicroFrontendRegistry>;
 export default getRegistries;
 interface MicroFrontendRegistry {
@@ -6,7 +5,7 @@ interface MicroFrontendRegistry {
     unmount: UnmountMicroFrontend;
 }
 interface RenderMicroFrontend {
-    (history: History, microFrontendPath: string): void;
+    (microFrontendPath: string): void;
 }
 interface UnmountMicroFrontend {
     (): void;

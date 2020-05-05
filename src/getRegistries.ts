@@ -1,5 +1,3 @@
-import { History } from 'history';
-
 const MF_REGISTRIES_KEY = '_mfRegistries';
 
 const getRegistries = () => {
@@ -21,7 +19,7 @@ interface MicroFrontendRegistry {
 }
 
 interface RenderMicroFrontend {
-  (history: History, microFrontendPath: string): void;
+  (microFrontendPath: string): void;
 }
 
 interface UnmountMicroFrontend {

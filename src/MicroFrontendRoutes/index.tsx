@@ -1,5 +1,5 @@
 import React, { FC, memo, Suspense, SuspenseProps } from 'react';
-import { Switch } from 'react-router';
+import { Switch } from 'react-router-dom';
 import MicroFrontendRoute from '../MicroFrontendRoute';
 import { MicroFrontendRouteProps } from '../types';
 
