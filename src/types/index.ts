@@ -16,6 +16,6 @@ export interface MicroFrontendProps {
 
 export interface MicroFrontendRouteProps
   extends OmitFrom<RouteProps, 'path' | 'render'>,
-    OmitFrom<MicroFrontendProps, 'name'> {
+    OmitFrom<MicroFrontendProps, 'history' | 'name'> {
   microFrontendName: string;
 }
