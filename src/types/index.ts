@@ -1,4 +1,5 @@
 import { RouteProps } from 'react-router-dom';
+import { History } from 'history';
 import { OmitFrom } from 'cb-toolset/object';
 
 export interface MicroFrontendAppProps {
@@ -7,6 +8,7 @@ export interface MicroFrontendAppProps {
 }
 
 export interface MicroFrontendProps {
+  history: History;
   host: string;
   name: string;
   path: string;

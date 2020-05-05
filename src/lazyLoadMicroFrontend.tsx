@@ -1,4 +1,5 @@
 import React, { lazy, FC } from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 import MicroFrontend from './MicroFrontend';
 import { setMicroFrontendInfo } from './microFrontendLoader';
 
@@ -67,8 +68,13 @@ const lazyLoadMicroFrontend = ({
       await loadScripts(manifest, host, scriptId);
       loadStyles(manifest, host);
     }
-    const Component: FC = () => (
-      <MicroFrontend host={host} name={microFrontendName} path={path} />
+    const Component: FC<RouteComponentProps> = ({ history }) => (
+      <MicroFrontend
+        history={history}
+        host={host}
+        name={microFrontendName}
+        path={path}
+      />
     );
     return { default: Component };
   });

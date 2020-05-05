@@ -1,28 +1,13 @@
-import React, { ComponentType } from 'react';
+import React, { ComponentType, ReactElement } from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
-import MicroFrontendWrapper from './MicroFrontendWrapper';
+import { Router, BrowserRouter } from 'react-router-dom';
 import getRegistries from './getRegistries';
 import { generateContainerId } from './utils';
 import { MicroFrontendAppProps } from './types';
 import { isLoadedAsMicroFrontend } from './microFrontendLoader';
 
-const renderApp = (
-  containerId: string,
-  App: ComponentType<MicroFrontendAppProps>,
-  microFrontendPath: string,
-  isMicroFrontend: boolean,
-) => {
-  const Wrapper = isMicroFrontend ? MicroFrontendWrapper : BrowserRouter;
-  ReactDOM.render(
-    <Wrapper>
-      <App
-        isMicroFrontend={isMicroFrontend}
-        microFrontendPath={microFrontendPath}
-      />
-    </Wrapper>,
-    document.getElementById(containerId),
-  );
+const renderRoot = (rootId: string, root: ReactElement) => {
+  ReactDOM.render(root, document.getElementById(rootId));
 };
 
 const registerApp = (
@@ -37,8 +22,13 @@ const registerApp = (
     );
   }
   registries.set(name, {
-    render: microFrontendPath => {
-      renderApp(generateContainerId(name), App, microFrontendPath, true);
+    render: (history, microFrontendPath) => {
+      renderRoot(
+        generateContainerId(name),
+        <Router history={history}>
+          <App isMicroFrontend microFrontendPath={microFrontendPath} />
+        </Router>,
+      );
       callback?.();
     },
     unmount: () => {
@@ -58,7 +48,12 @@ const bootstrapMicroFrontend = (
   if (isLoadedAsMicroFrontend(microFrontendName)) {
     registerApp(microFrontendName, App, callback);
   } else {
-    renderApp(rootId, App, '', false);
+    renderRoot(
+      rootId,
+      <BrowserRouter>
+        <App isMicroFrontend={false} microFrontendPath="" />
+      </BrowserRouter>,
+    );
   }
 };
 

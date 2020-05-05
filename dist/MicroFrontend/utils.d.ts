@@ -1,2 +1,2 @@
 import { MicroFrontendProps } from '../types';
-export declare const useMicroFrontend: ({ host, name, path }: MicroFrontendProps) => void;
+export declare const useMicroFrontend: ({ history, host, name, path, }: MicroFrontendProps) => void;
