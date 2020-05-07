@@ -1,5 +1,4 @@
 import { MF_INFO_KEY } from 'cb-react-micro-frontend-core';
-import Cookies from 'js-cookie';
 
 const win = (window as unknown) as MicroFrontendGlobal;
 
@@ -11,18 +10,12 @@ export const isLoadedAsMicroFrontend = (name: string) =>
 export const removeMicroFrontendInfo = (name?: string) => {
   if (!name || win[MF_INFO_KEY]?.name === name) {
     win[MF_INFO_KEY] = undefined;
-    Cookies.remove(MF_INFO_KEY);
   }
 };
 
 export const setMicroFrontendInfo = (name: string, host: string) => {
   const info: MicroFrontendInfo = { host, name };
   win[MF_INFO_KEY] = info;
-  Cookies.set(MF_INFO_KEY, info, {
-    expires: 10 * 365,
-    path: '/',
-    sameSite: 'strict',
-  });
 };
 
 interface MicroFrontendGlobal {

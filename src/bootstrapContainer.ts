@@ -1,7 +1,7 @@
-import { removeMicroFrontendInfo } from './microFrontendLoader';
+import setPublicPath from './setPublicPath';
 
 const bootstrapContainer = () => {
-  removeMicroFrontendInfo();
+  setPublicPath();
 };
 
 export default bootstrapContainer;

@@ -5,6 +5,7 @@ import getRegistries from './getRegistries';
 import { generateContainerId } from './utils';
 import { MicroFrontendAppProps } from './types';
 import { isLoadedAsMicroFrontend } from './microFrontendLoader';
+import setPublicPath from './setPublicPath';
 
 const renderRoot = (rootId: string, root: ReactElement) => {
   ReactDOM.render(root, document.getElementById(rootId));
@@ -45,6 +46,7 @@ const bootstrapMicroFrontend = (
   callback?: VoidFunction,
   rootId = 'root',
 ) => {
+  setPublicPath();
   if (isLoadedAsMicroFrontend(microFrontendName)) {
     registerApp(microFrontendName, App, callback);
   } else {

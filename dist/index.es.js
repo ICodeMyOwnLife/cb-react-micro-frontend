@@ -1,5 +1,4 @@
 import React, { useEffect, memo, lazy, Suspense } from 'react';
-import Cookies from 'js-cookie';
 import { Route, Switch, BrowserRouter, Router } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 
@@ -21,17 +20,11 @@ const removeMicroFrontendInfo = (name) => {
     var _a;
     if (!name || ((_a = win[_]) === null || _a === void 0 ? void 0 : _a.name) === name) {
         win[_] = undefined;
-        Cookies.remove(_);
     }
 };
 const setMicroFrontendInfo = (name, host) => {
     const info = { host, name };
     win[_] = info;
-    Cookies.set(_, info, {
-        expires: 10 * 365,
-        path: '/',
-        sameSite: 'strict',
-    });
 };
 
 const renderMicroFrontend = (name, history, microFrontendPath) => { var _a; return (_a = getRegistries().get(name)) === null || _a === void 0 ? void 0 : _a.render(history, microFrontendPath); };
@@ -145,8 +138,14 @@ const MicroFrontendRoutesComponent = ({ fallback, routeProps, }) => (React.creat
 const MicroFrontendRoutes = memo(MicroFrontendRoutesComponent);
 MicroFrontendRoutes.displayName = 'MicroFrontendRoutes';
 
+const PUBLIC_PATH_KEY = '__webpack_public_path__';
+const setPublicPath = () => {
+    const win = window;
+    win[PUBLIC_PATH_KEY] = process.env.REACT_APP_PUBLIC_PATH;
+};
+
 const bootstrapContainer = () => {
-    removeMicroFrontendInfo();
+    setPublicPath();
 };
 
 const renderRoot = (rootId, root) => {
@@ -169,6 +168,7 @@ const registerApp = (name, App, callback) => {
     });
 };
 const bootstrapMicroFrontend = (microFrontendName, App, callback, rootId = 'root') => {
+    setPublicPath();
     if (isLoadedAsMicroFrontend(microFrontendName)) {
         registerApp(microFrontendName, App, callback);
     }
@@ -178,4 +178,4 @@ const bootstrapMicroFrontend = (microFrontendName, App, callback, rootId = 'root
     }
 };
 
-export { MicroFrontend, MicroFrontendRoute, MicroFrontendRoutes, bootstrapContainer, bootstrapMicroFrontend, lazyLoadMicroFrontend };
+export { MicroFrontend, MicroFrontendRoute, MicroFrontendRoutes, bootstrapContainer, bootstrapMicroFrontend };

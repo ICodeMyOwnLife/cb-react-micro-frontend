@@ -5,9 +5,7 @@ import filesize from 'rollup-plugin-filesize';
 
 const input = 'src/index.ts';
 const external = id =>
-  !!id.match(
-    /^(react|react-dom|history|react-router|react-router-dom|js-cookie)/,
-  );
+  !!id.match(/^(react|react-dom|history|react-router|react-router-dom)/);
 const tsconfig = './tsconfig.json';
 const plugins = [
   typescript({ tsconfig, clean: true }),
