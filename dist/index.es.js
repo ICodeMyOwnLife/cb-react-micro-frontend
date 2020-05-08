@@ -138,10 +138,8 @@ const MicroFrontendRoutesComponent = ({ fallback, routeProps, }) => (React.creat
 const MicroFrontendRoutes = memo(MicroFrontendRoutesComponent);
 MicroFrontendRoutes.displayName = 'MicroFrontendRoutes';
 
-const PUBLIC_PATH_KEY = '__webpack_public_path__';
 const setPublicPath = () => {
-    const win = window;
-    win[PUBLIC_PATH_KEY] = process.env.REACT_APP_PUBLIC_PATH;
+    __webpack_public_path__ = process.env.REACT_APP_PUBLIC_PATH;
 };
 
 const bootstrapContainer = () => {

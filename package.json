@@ -22,7 +22,7 @@
     "lint:fix": "yarn lint --fix",
     "prebuild": "del dist",
     "release": "release-it",
-    "size": "yarn build && size-limit",
+    "size": "size-limit",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
