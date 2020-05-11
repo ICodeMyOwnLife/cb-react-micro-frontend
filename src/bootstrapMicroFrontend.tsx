@@ -46,8 +46,8 @@ const bootstrapMicroFrontend = (
   callback?: VoidFunction,
   rootId = 'root',
 ) => {
-  setPublicPath();
   if (isLoadedAsMicroFrontend(microFrontendName)) {
+    setPublicPath();
     registerApp(microFrontendName, App, callback);
   } else {
     renderRoot(

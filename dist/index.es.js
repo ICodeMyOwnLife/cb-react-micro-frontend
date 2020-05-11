@@ -138,12 +138,13 @@ const MicroFrontendRoutesComponent = ({ fallback, routeProps, }) => (React.creat
 const MicroFrontendRoutes = memo(MicroFrontendRoutesComponent);
 MicroFrontendRoutes.displayName = 'MicroFrontendRoutes';
 
-const setPublicPath = () => {
-    __webpack_public_path__ = process.env.REACT_APP_PUBLIC_PATH;
+const bootstrapContainer = (App, rootId = 'root') => {
+    ReactDOM.render(React.createElement(BrowserRouter, null,
+        React.createElement(App, null)), document.getElementById(rootId));
 };
 
-const bootstrapContainer = () => {
-    setPublicPath();
+const setPublicPath = () => {
+    __webpack_public_path__ = process.env.REACT_APP_PUBLIC_PATH;
 };
 
 const renderRoot = (rootId, root) => {
@@ -166,8 +167,8 @@ const registerApp = (name, App, callback) => {
     });
 };
 const bootstrapMicroFrontend = (microFrontendName, App, callback, rootId = 'root') => {
-    setPublicPath();
     if (isLoadedAsMicroFrontend(microFrontendName)) {
+        setPublicPath();
         registerApp(microFrontendName, App, callback);
     }
     else {

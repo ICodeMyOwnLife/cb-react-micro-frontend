@@ -2,10 +2,9 @@ import typescript from 'rollup-plugin-typescript2';
 import resolve from '@rollup/plugin-node-resolve';
 import cleanup from 'rollup-plugin-cleanup';
 import filesize from 'rollup-plugin-filesize';
+import pkg from './package.json';
 
-const input = 'src/index.ts';
-const external = id =>
-  !!id.match(/^(react|react-dom|history|react-router|react-router-dom)/);
+const external = ['react', 'react-dom', 'react-router-dom'];
 const tsconfig = './tsconfig.json';
 const plugins = [
   typescript({ tsconfig, clean: true }),
@@ -15,10 +14,10 @@ const plugins = [
 ];
 const watch = { include: ['src/**'] };
 const esOptions = {
-  input,
+  input: pkg.source,
   external,
   output: {
-    file: 'dist/index.es.js',
+    file: pkg.module,
     format: 'es',
   },
   plugins,

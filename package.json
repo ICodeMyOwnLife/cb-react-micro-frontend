@@ -14,9 +14,8 @@
   ],
   "scripts": {
     "build": "rollup -c",
-    "build:config": "tsc rollup.config.ts --target es2017 --module es2015 --moduleResolution node --skipLibCheck --allowSyntheticDefaultImports",
+    "build:config": "tsc rollup.config.ts --target es2017 --module es2015 --moduleResolution node --skipLibCheck --allowSyntheticDefaultImports --resolveJsonModule",
     "commit": "git-cz",
-    "dev": "microbundle watch --jsx React.createElement",
     "format": "prettier --write \"src/**/*.{ts,tsx,md}\"",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "lint:fix": "yarn lint --fix",
@@ -26,7 +25,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "cb-react-micro-frontend-core": "^0.0.5"
+    "cb-react-micro-frontend-core": "^0.0.5",
+    "cb-toolset": "^0.1.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
@@ -39,11 +39,10 @@
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.7",
     "@types/react-router-dom": "^5.1.5",
-    "cb-toolset": "^0.1.1",
     "commitizen": "^4.1.2",
     "cz-conventional-changelog": "^3.2.0",
     "del-cli": "^3.0.0",
-    "eslint": "^6.8.0",
+    "eslint": "^7.0.0",
     "eslint-config-react-ts": "^2.1.0",
     "husky": "^4.2.3",
     "lint-staged": "^10.2.2",
@@ -58,7 +57,6 @@
     "typescript": "^3.8.3"
   },
   "peerDependencies": {
-    "cb-toolset": "^0.0.4",
     "react": "> 16.8.0",
     "react-dom": "> 16.8.0",
     "react-router-dom": "^5.1.2"
