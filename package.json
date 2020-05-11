@@ -1,6 +1,6 @@
 {
   "name": "cb-react-micro-frontend",
-  "version": "0.0.34",
+  "version": "0.0.35",
   "description": "Reusable functions for setting up micro-frontends and containers",
   "author": "Hien CB",
   "repository": "https://github.com/ICodeMyOwnLife/cb-react-micro-frontend.git",
