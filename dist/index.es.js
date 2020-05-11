@@ -1,5 +1,5 @@
 import React, { useEffect, memo, lazy, Suspense } from 'react';
-import { Route, Switch, BrowserRouter, Router } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Router } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 
 const generateContainerId = (name) => `${name}Container`;
@@ -44,6 +44,10 @@ const MicroFrontendComponent = ({ history, host, name, path, }) => {
 };
 const MicroFrontend = memo(MicroFrontendComponent);
 MicroFrontend.displayName = 'MicroFrontend';
+
+const MicroFrontendContainerComponent = ({ children, }) => React.createElement(BrowserRouter, null, children);
+const MicroFrontendContainer = memo(MicroFrontendContainerComponent);
+MicroFrontendContainer.displayName = 'MicroFrontendContainer';
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -138,11 +142,6 @@ const MicroFrontendRoutesComponent = ({ fallback, routeProps, }) => (React.creat
 const MicroFrontendRoutes = memo(MicroFrontendRoutesComponent);
 MicroFrontendRoutes.displayName = 'MicroFrontendRoutes';
 
-const bootstrapContainer = (App, rootId = 'root') => {
-    ReactDOM.render(React.createElement(BrowserRouter, null,
-        React.createElement(App, null)), document.getElementById(rootId));
-};
-
 const setPublicPath = () => {
     __webpack_public_path__ = process.env.REACT_APP_PUBLIC_PATH;
 };
@@ -177,4 +176,4 @@ const bootstrapMicroFrontend = (microFrontendName, App, callback, rootId = 'root
     }
 };
 
-export { MicroFrontend, MicroFrontendRoute, MicroFrontendRoutes, bootstrapContainer, bootstrapMicroFrontend };
+export { MicroFrontend, MicroFrontendContainer, MicroFrontendRoute, MicroFrontendRoutes, bootstrapMicroFrontend };
