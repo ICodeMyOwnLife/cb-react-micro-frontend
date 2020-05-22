@@ -1,5 +1,4 @@
 {
-  "extends": [
-    "react-ts"
-  ]
+  "extends": ["react-ts"],
+  "ignorePatterns": ["*.js"]
 }

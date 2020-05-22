@@ -24,7 +24,6 @@ const loadScripts = (manifest: Manifest, host: string, scriptId: string) =>
       const entryUrl = resolveUrl(host, entry);
       const script = document.createElement('script');
       script.src = entryUrl;
-      script.async = true;
       script.crossOrigin = '';
       if (entryUrl === mainJsUrl) script.id = scriptId;
       script.onload = () => {

@@ -3,10 +3,15 @@ import { RollupOptions, ExternalOption, Plugin, WatcherOptions } from 'rollup';
 import typescript from 'rollup-plugin-typescript2';
 import resolve from '@rollup/plugin-node-resolve';
 import cleanup from 'rollup-plugin-cleanup';
-import filesize from 'rollup-plugin-filesize';
-import pkg from './package.json';
+import filesize from 'cb-rollup-plugin-filesize';
+import pkg from '../package.json';
 
-const external: ExternalOption = ['react', 'react-dom', 'react-router-dom'];
+const external: ExternalOption = [
+  'react',
+  'react-dom',
+  'react-router-dom',
+  'history',
+];
 const tsconfig = './tsconfig.json';
 const plugins: Plugin[] = [
   typescript({ tsconfig, clean: true }),
@@ -22,6 +27,7 @@ const esOptions: RollupOptions = {
   output: {
     file: pkg.module,
     format: 'es',
+    sourcemap: true,
   },
   plugins,
   watch,
